@@ -13,16 +13,16 @@ upstream 深检。用途是排障入口——人第一次遇到 CLI 报错、或
 `data-dir` 项（新增， 复核 I-1/I-2 后校正）检查
 gateway 默认数据目录（`$TTPOS_CONFIG_DIR/gateway`，否则 `~/.ttpos/gateway`）
 是否可写、以及目录下已存在的 `gateway.db`/`audit.jsonl` 是否可打开（曾用
-sudo 跑过 gateway、文件归 root 的场景），把只读容器/权限问题提前到自查阶段
-暴露，不用等 `gateway serve` 启动时才因 `MkdirAll`/`store.Open` 失败而
-exit 1。它是纯本地文件系统探测，**不参与 gateway 不可达触发的 skip
-连锁**——即便 `gateway` 项是 `fail` 导致 `auth`/`upstream` 都 `skip`，
-`data-dir` 仍照常给出 `ok`/`warn` 结论（顺序上排在 `credentials` 之后、
-`auth` 之前）。**这一项从不产生 `fail`**：它只探测默认路径，doctor 本身
-没有 `--data-dir` flag，无法判断调用方最终会不会显式传参绕开默认路径，或
-根本不在本机跑 `gateway serve`（如连远端 gateway），因此默认路径不可用统一
-判 `warn` 而不是 `fail`，不会让这类用户的可用环境被 doctor 判定成"环境损
-坏"（exit 1）。
+sudo 跑过 gateway、文件归 root 的场景）。进程内默认查询（如 `order list`）
+与 `ttpos gateway serve` 打开的是**同一路径**，把只读容器/权限问题提前到
+自查阶段暴露，不用等首次 Open 才失败。它是纯本地文件系统探测，**不参与
+gateway 不可达触发的 skip 连锁**——即便 `gateway` 项是 `fail` 导致
+`auth`/`upstream` 都 `skip`，`data-dir` 仍照常给出 `ok`/`warn` 结论（顺序
+上排在 `credentials` 之后、`auth` 之前）。**这一项从不产生 `fail`**：它只
+探测默认路径。`--data-dir` **仅** `ttpos gateway serve` 可用，**不能**用来
+修 `order list`。连远端 gateway 的用户本机不打开这份 store，因此默认路径
+不可用统一判 `warn` 而不是 `fail`，不会把这类可用环境判定成"环境损坏"
+（exit 1）。
 
 ## Agent 用法：`--format json` 自诊断
 
@@ -60,15 +60,17 @@ ttpos doctor --format json
 |---|---|---|---|
 | `cli-version` | warn | `shared.Version` 仍是未注入的 `dev`（开发构建） | （无，说明性告警，不阻断） |
 | `cli-version` | ok/warn | 恒定行为（非独立触发条件） | `detail` 现附带 `(上游上报 Client-Version=2.26.20)`——这是 gateway 调用上游时统一上报的固定版本头（`internal/shared.UpstreamClientVersion`），用于放行 purchase/statistics/transfer/stock_reconciliation 四个受版本门禁的域，与 `shared.Version`（CLI 自身构建版本）是两个不同概念，不参与 ok/warn 判定，仅供排障核对当前实际上报值 |
-| `gateway` | fail | `--gateway`/`TTPOS_GATEWAY_URL`/config.json 均未配置 gateway 地址 | 设置 --gateway，或 TTPOS_GATEWAY_URL 环境变量，或在 ~/.ttpos/config.json 配置 gateway_url |
-| `gateway` | fail | 已配置地址但连不上/响应解析失败 | 检查 gateway 进程，或设置 TTPOS_GATEWAY_URL；运行 ttpos gateway serve 启动本地 gateway |
-| `gateway` | warn | 可达，但 `/healthz` 返回的 version 与 CLI 的 `shared.Version` 不一致 | （无，提示升级其中一侧使版本对齐，非阻断） |
+| `gateway` | ok | 未配置远端 URL（进程内打开成功） | （无，`detail` 为「进程内（无需 ttpos gateway serve）」） |
+| `gateway` | fail | 进程内打开失败，且错误是 bbolt 锁超时（`errors.Is(err, bolt.ErrTimeout)`，会话库被另一 ttpos 进程占用） | 等另一个 ttpos 进程结束，或运行 ttpos gateway serve 供多客户端共用（**不要**设 TTPOS_CONFIG_DIR——那会打开第二份空库） |
+| `gateway` | fail | 进程内打开失败（权限 / mkdir 等，非锁超时） | 检查数据目录权限，或设置 TTPOS_CONFIG_DIR 指向可写目录 |
+| `gateway` | fail | 已配置远端 URL 但 healthz 失败 | 检查 gateway 进程或 TTPOS_GATEWAY_URL；本地默认已不需要 serve，若 config.json 仍写着 http://127.0.0.1:7080 可删掉 gateway_url |
+| `gateway` | warn | 远端可达，但 `/healthz` 返回的 version 与 CLI 的 `shared.Version` 不一致 | （无，提示升级其中一侧使版本对齐，非阻断） |
 | `credentials` | warn | 凭证走文件回退（非 keychain）且文件权限不是 `0600` | `chmod 600 <凭证文件路径>` |
 | `credentials` | fail | `LoadToken` 本身报错（非"未找到"） | （无固定文案，看 detail 里的具体错误） |
 | `data-dir` | ok | 默认数据目录已存在且实测可写（真实创建+删除临时文件，不看权限位），且 `gateway.db`/`audit.jsonl`（若已存在）都能正常打开 | （无） |
 | `data-dir` | ok | 默认数据目录尚不存在，但最近的已存在祖先目录可写（`MkdirAll` 会从那里逐级创建） | （无，`detail` 注明"将在首次启动时创建"） |
-| `data-dir` | warn | `HOME` 取不到且未设 `TTPOS_CONFIG_DIR`，无法确定默认路径（不算环境损坏——用户本就可以每次显式传 `--data-dir`） | 请显式指定 --data-dir |
-| `data-dir` | warn | 目录（或其可创建的最近祖先目录）不可写 / 目录路径已被占用但不是目录 / `gateway.db`/`audit.jsonl` 已存在但打不开（如曾用 sudo 跑过 gateway，文件归 root） | 用 --data-dir 指向可写目录，或检查文件属主/权限（本项只探测默认路径，不影响显式传 --data-dir 或连远端 gateway 的用户，可忽略） |
+| `data-dir` | warn | `HOME` 取不到且未设 `TTPOS_CONFIG_DIR`，无法确定默认路径（不算环境损坏） | 设置 TTPOS_CONFIG_DIR 指向可写目录；`--data-dir` 仅 gateway serve 可用，不能用来修 order list |
+| `data-dir` | warn | 目录（或其可创建的最近祖先目录）不可写 / 目录路径已被占用但不是目录 / `gateway.db`/`audit.jsonl` 已存在但打不开（如曾用 sudo 跑过 gateway，文件归 root） | 检查默认数据目录权限（容器请挂可写卷）。默认查询（如 order list）与 gateway serve 共用此路径；`--data-dir` 仅 gateway serve 可用，不能用来修 order list。用 TTPOS_GATEWAY_URL 连远端时本项可忽略 |
 | `auth` | skip | 前序 `gateway` 检查已是 `fail` | 不是可操作建议——先解决 gateway 那一项，auth 自然会重新执行 |
 | `auth` | fail | 本地无 token / 请求 `/v1/me` 失败 / token 已过期或被拒 | **运行 ttpos auth login** |
 | `shop-context` | warn | 三级（`TTPOS_SHOP` 环境变量/项目配置/全局配置）都未配置默认商户（可选项） | `ttpos shop use <名称|uuid>` |
@@ -114,10 +116,10 @@ ttpos doctor --gateway http://127.0.0.1:8090
 
 `doctor` 有自己的 `--gateway` flag，优先级同其它命令：`--gateway` >
 `TTPOS_GATEWAY_URL` 环境变量 > `~/.ttpos/config.json` 的 `gateway_url`。
-解析出的这一份地址贯穿本次运行的全部网络检查——`gateway` 项探测的
-`/healthz`、`auth` 项调用的 `/v1/me`、`--network` 才会出现的 `upstream`
-项调用的 `/v1/shops`，三处共用同一个已解析地址，不是只影响 `gateway`
-这一项。
+**全空 = 进程内**：`gateway` 项 ok（无需 serve），`auth`/`upstream` 走同一
+次打开的本地 store，不探测 7080。只有解析到远端 URL 时，该地址才贯穿本次
+运行的网络检查——`gateway` 项探测的 `/healthz`、`auth` 项调用的 `/v1/me`、
+`--network` 才会出现的 `upstream` 项调用的 `/v1/shops`。
 
 网络超时按检查项分别设置，不是全局统一一个值：`gateway` 探测
 `/healthz` 用 **2s** 超时；`auth`/`upstream` 各用 **5s**（doctor 内部收
@@ -135,9 +137,10 @@ ttpos doctor --network      # 追加第七项 upstream：经 gateway GET /v1/sho
 ```
 
 - 不加 `--network` 时 `checks` 数组里压根不会出现 `upstream` 这一项（不
-  是"跳过"，是"根本没跑"）——本地六项检查全部只碰凭证文件、数据目录、
-  本地配置、gateway 的 `/healthz`（2s 超时），**不需要能连到 TTPOS 上游**
-  就能给出结论。
+  是"跳过"，是"根本没跑"）——本地六项检查碰凭证文件、数据目录、本地配
+  置；未配置远端时 gateway 走进程内，**不探测 7080、不需要 `gateway
+  serve`**。配置了远端才打 `/healthz`（2s 超时）。**不需要能连到 TTPOS
+  上游**就能给出结论。
 - 加了 `--network` 且 `gateway`/`auth` 都健康时，才会真的经 gateway 转发
   一次 `GET /v1/shops`，`ok` 时 `detail` 是"可访问 N 家商户"这类计数，用
   于确认"不仅本地凭证有效，上游也认这个 token、能拿到数据"。

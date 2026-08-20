@@ -134,10 +134,13 @@ main() {
 	check_path
 	info ""
 	info "下一步："
-	info "  1. 另开一个终端窗口运行 $BIN gateway serve（该窗口需保持开启）"
-	info "  2. $BIN auth login        登录"
-	info "  3. $BIN shop use <店名>   选默认商户"
-	info "  4. $BIN order list        开始查数据"
+	info "  1. $BIN auth login        浏览器打开打印出的网址并登录（命令会等待，完成后退出）"
+	info "  2. $BIN shop use <店名>   选默认商户"
+	info "  3. $BIN order list        开始查"
+	info ""
+	info "不用另开窗口跑 gateway serve。远端/Coder 才需要："
+	info "  $BIN gateway serve --public-url https://..."
+	info "  $BIN auth login --gateway https://..."
 	info ""
 	info "随时可运行 $BIN doctor 自查环境。"
 }

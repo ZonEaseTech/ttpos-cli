@@ -1,6 +1,6 @@
 ---
 name: ttpos-recharge
-description: Use this skill when the user (or an agent) needs to look up TTPOS shop recharge/top-up orders (会员充值订单) via the `ttpos` CLI — list a shop's recharge orders within a date range/order-no filter, fetch a single recharge order's full detail, or check its refundable-amount info, all by `uuid`. Applies to questions like "这个门店最近充值了多少笔"、"这笔充值订单能退多少钱"、"充值订单详情". Do not use for regular sales orders (`ttpos order`) or member sale orders (`ttpos member-order`) — those are separate skills. This skill is read-only: `refund-info` only queries refundable amount, it does NOT execute a refund (no refund command exists in this CLI yet — 见「已知局限」). `--shop` resolution is documented once in `ttpos-shared`, not repeated here.
+description: 'Use this skill when the user (or an agent) needs to look up TTPOS shop recharge/top-up orders (会员充值订单) via the `ttpos` CLI — list a shop''s recharge orders within a date range/order-no filter, fetch a single recharge order''s full detail, or check its refundable-amount info, all by `uuid`. Applies to questions like "这个门店最近充值了多少笔"、"这笔充值订单能退多少钱"、"充值订单详情". Do not use for regular sales orders (`ttpos order`) or member sale orders (`ttpos member-order`) — those are separate skills. This skill is read-only: `refund-info` only queries refundable amount, it does NOT execute a refund (no refund command exists in this CLI yet — 见「已知局限」). `--shop` resolution is documented once in `ttpos-shared`, not repeated here.'
 ---
 
 # ttpos-recharge
@@ -12,9 +12,9 @@ description: Use this skill when the user (or an agent) needs to look up TTPOS s
 
 ## 前置条件
 
-- gateway 已启动且可达（`TTPOS_GATEWAY_URL` 环境变量或 `--gateway` flag，
-  解析优先级同 auth：`--gateway` > `TTPOS_GATEWAY_URL` >
-  `~/.ttpos/config.json` 的 `gateway_url`）。
+- 默认走进程内，无需 `ttpos gateway serve`；只有连远端时才需要 `--gateway` /
+  `TTPOS_GATEWAY_URL` / config.json 的 `gateway_url`（优先级同 auth：
+  `--gateway` > `TTPOS_GATEWAY_URL` > `gateway_url`，全空走进程内）。
 - 已登录（本地凭证里有 token）。
 - 目标商户的标识——uuid、本机别名、商户名全称或前缀都可以，也可以什么都
   不传，让四级上下文兜底。**这条解析规则是全部域命令共用的**，完整说明见

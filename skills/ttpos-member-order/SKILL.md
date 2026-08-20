@@ -12,9 +12,9 @@ return-info` 通过本地 gateway 查询 TTPOS 商户的会员订单。三者都
 
 ## 前置条件
 
-- gateway 已启动且可达（`TTPOS_GATEWAY_URL` 环境变量或 `--gateway` flag，
-  解析优先级同 auth：`--gateway` > `TTPOS_GATEWAY_URL` >
-  `~/.ttpos/config.json` 的 `gateway_url`）。
+- 默认走进程内，无需 `ttpos gateway serve`；只有连远端时才需要 `--gateway` /
+  `TTPOS_GATEWAY_URL` / config.json 的 `gateway_url`（优先级同 auth：
+  `--gateway` > `TTPOS_GATEWAY_URL` > `gateway_url`，全空走进程内）。
 - 已登录（本地凭证里有 token）。
 - 目标商户的标识——uuid、本机别名、商户名全称或前缀都可以，也可以什么都
   不传，让四级上下文兜底。**这条解析规则是全部域命令共用的**，完整说明见

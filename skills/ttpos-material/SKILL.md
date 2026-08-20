@@ -17,7 +17,7 @@ description: Use this skill when the user (or an agent) needs to look up TTPOS s
 
 ## 前置条件
 
-- gateway 已启动且可达（`TTPOS_GATEWAY_URL` 环境变量或 `--gateway` flag）。
+- 默认走进程内，无需 `ttpos gateway serve`；只有连远端时才需要 `--gateway` / `TTPOS_GATEWAY_URL` / config.json 的 `gateway_url`（优先级 `--gateway` > `TTPOS_GATEWAY_URL` > `gateway_url`，全空走进程内）。
 - 已登录（本地凭证里有 token）。
 - 全域 grep `ctx.Version(` 零命中——**无版本分叉**，不像 `purchase` 域
   受 `MinVersionCheck` 门槛限制，不需要关心 `Client-Version` 头。

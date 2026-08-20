@@ -44,19 +44,25 @@ curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.
 ## 上手
 
 ```sh
-ttpos gateway serve      # 1. 另开一个终端窗口运行，该窗口需保持开启
-ttpos auth login         # 2. 登录（会给出一个网址，在浏览器里完成）
-ttpos shop use <店名>     # 3. 选默认商户
-ttpos order list         # 4. 开始查
+ttpos auth login         # 1. 浏览器打开打印出的网址并登录（命令会等待，完成后退出）
+ttpos shop use <店名>     # 2. 选默认商户
+ttpos order list         # 3. 开始查
 ```
 
-第 1 步是必需的:`ttpos` 本身不直接连服务器,而是通过一个跑在你自己机器上
-的本地服务(gateway)。它默认只监听本机,登录状态也只存在本机。
-
-**关闭那个窗口 gateway 就停了**,再敲命令会提示连不上。目前需要手动保持
-运行。
+登录时命令会自己在本机起一个临时授权页,登完就退出,不用另开窗口。查数据
+也走进程内,不需要常驻服务。凭证只存在本机。
 
 卡住时先跑 `ttpos doctor`,它会逐项检查并告诉你下一步做什么。
+
+### 远端授权 / Coder
+
+笔记本默认不用这一步。只有授权页需要给别的机器打开时(Coder、`--public-url`)
+才常驻 gateway:
+
+```sh
+ttpos gateway serve --public-url https://...   # 机器 A
+ttpos auth login --gateway https://...         # 机器 B（可用 --no-wait）
+```
 
 ## 能查什么
 
@@ -79,16 +85,18 @@ ttpos order list         # 4. 开始查
 
 ## 给 AI agent 用
 
-配套 skills 覆盖每个命令域的用法、参数陷阱与已知局限:
+配套 skills 覆盖每个命令域的用法、参数陷阱与已知局限。
+井号后面的版本必须和 `ttpos --version` 一致（不要写成 `@v0.2.0`，那个会被
+当成 skill 名，不是版本）：
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli
+npx skills add ZonEaseTech/ttpos-cli#v0.2.0
 ```
 
 也可以只装需要的:
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli --skill ttpos-order --skill ttpos-shared
+npx skills add ZonEaseTech/ttpos-cli#v0.2.0 --skill ttpos-order --skill ttpos-shared
 ```
 
 `ttpos-shared` 描述了所有命令共用的 `--shop` 解析规则,建议与任一其他
