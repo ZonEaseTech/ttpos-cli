@@ -85,18 +85,16 @@ ttpos auth login --gateway https://...         # 机器 B（可用 --no-wait）
 
 ## 给 AI agent 用
 
-配套 skills 覆盖每个命令域的用法、参数陷阱与已知局限。
-井号后面的版本必须和 `ttpos --version` 一致（不要写成 `@v0.2.0`，那个会被
-当成 skill 名，不是版本）：
+配套 skills 覆盖每个命令域的用法、参数陷阱与已知局限:
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli#v0.2.0
+npx skills add ZonEaseTech/ttpos-cli
 ```
 
 也可以只装需要的:
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli#v0.2.0 --skill ttpos-order --skill ttpos-shared
+npx skills add ZonEaseTech/ttpos-cli --skill ttpos-order --skill ttpos-shared
 ```
 
 `ttpos-shared` 描述了所有命令共用的 `--shop` 解析规则,建议与任一其他
