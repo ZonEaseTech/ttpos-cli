@@ -1,6 +1,6 @@
 ---
 name: ttpos-shared
-description: Use this skill whenever another ttpos-cli skill (ttpos-order, ttpos-shop, or any future one) is in play and the task touches the `--shop` flag, shop resolution, local aliases, or the default-shop context — e.g. "用别名查订单"、"设置默认商户"、"这个 --shop 参数能不能填名字"、"resolved_shop 是什么". This skill documents the shared `--shop` resolution contract; other skills assume the caller has already read it and only cover their own command-specific flags. Do not use this in isolation to answer questions unrelated to shop identification (order filters, auth flow, etc. — see the command-specific skill instead).
+description: Use this skill whenever another ttpos-cli skill (ttpos-order, ttpos-shop, or any future one) is in play and the task touches the `--shop` flag, shop resolution, local aliases, or the default-shop context, or login (`ttpos auth login`, exit 3 未登录, remote/Coder login, agent --no-wait handoff) — e.g. "用别名查订单"、"设置默认商户"、"这个 --shop 参数能不能填名字"、"resolved_shop 是什么"、"怎么登录"、"远端机器登录". This skill documents the shared `--shop` resolution contract and the login flow; other skills assume the caller has already read it and only cover their own command-specific flags. Do not use this in isolation for command-specific questions (order filters, etc. — see the command-specific skill instead).
 ---
 
 # ttpos-shared
@@ -116,6 +116,53 @@ ttpos shop use <标识> --dir    # 写入 ./.ttpos/config.json（只对当前目
   ```json
   {"ok": true, "data": {...}, "resolved_shop": {"uuid": "<商户uuid>", "name": "(别名 t5609)"}}
   ```
+
+## 登录（所有命令的前置条件）
+
+未登录的命令一律 exit 3（`AUTH_REQUIRED`）。登录必须由人在浏览器完成，
+agent 不能代输密码：
+
+```bash
+ttpos auth login                 # 人在终端：自动开浏览器，核对码一致后登录
+ttpos auth login --port 7080     # CLI 在远端：再在本地 coder port-forward <ws> --tcp 7080
+                                 # 或 ssh -L 7080:127.0.0.1:7080 <host>，本地浏览器打开链接
+```
+
+agent 需要把链接转交给人时，用两段式，且**必须显式指向本机的
+`ttpos gateway serve`**（不会自动探测复用任何端口）：
+
+```bash
+ttpos gateway serve &                                              # 只监听 127.0.0.1:7080
+ttpos auth login --gateway http://127.0.0.1:7080 --no-wait         # 输出 verification_uri / user_code
+ttpos auth login --gateway http://127.0.0.1:7080 --device-code <device_code>   # 人授权后轮询拿 token
+```
+
+- 把 `verification_uri` 和 `user_code` 一起转给人，提醒「页面核对码与这里一致再登录」。
+- 授权链接只会是 `http://127.0.0.1` / `localhost`；gateway 返回别的地址时 CLI
+  直接报错（不同源）且不打印链接——这是防钓鱼，不要绕过。
+- 不带 `--gateway` 的 `--no-wait`、`--port` 越界或与 `--gateway` 同用、
+  `gateway serve --listen` 非回环，都是 `USAGE`（exit 2）。
+
+## 敏感信息
+
+所有命令的输出先经统一处理再交给调用方：
+
+| 类别 | 默认输出 | `--reveal` 时 |
+|---|---|---|
+| 密码、私钥、token、secret、salt 类（如 `advanced_password`） | 恒为 `"***"` | 仍为 `"***"` |
+| 手机号 | 保留末 4 位：`******5678` | 原值 |
+| 邮箱（含被当作 `username` 的邮箱） | 首字符 + 域名：`a***@example.com` | 原值 |
+| 税号、证件号、银行账号、会员卡号 | 保留末 4 位 | 原值 |
+| 详细地址 | 整体 `"***"`（门牌号可能在开头或结尾，保留前缀也会泄露） | 原值 |
+| 订单里的 `consumer_uuids`/`member_uuids`（实为 `昵称(手机号)`） | 括号内手机号保留末 4 位 | 原值 |
+
+另外，所有字符串里的 ANSI 转义序列与控制字符（`\n`、`\t` 除外）都会被去掉。
+
+- 打码后的值不是原值，**不能**拿去当 `staff search --keyword` 之类的查询条件。
+- `--reveal` 是全局 flag，**只在人明确要求查看完整联系方式时才加**；agent
+  不得为了"拿到完整数据"自行添加，也不要把加了 `--reveal` 的输出写进日志、
+  issue 或聊天记录。每次使用都会写入本机审计日志。
+- 空字符串、`null`、布尔/开关位（如 `is_need_password`）不打码。
 
 ## 退出码
 

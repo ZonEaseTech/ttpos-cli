@@ -1,12 +1,13 @@
 ---
 name: ttpos-member-order
-description: Use this skill when the user (or an agent) needs to look up TTPOS shop member orders (会员订单/会员消费单) via the `ttpos` CLI — list a shop's member orders within a date range/status/order-no filter, fetch a single member order's full detail, or check its return info, all by `member_sale_order_uuid`. Applies to questions like "查一下今天的会员订单"、"这笔会员订单的退货信息"、"这个会员账号今天下了几单". Do not use for regular sales orders (`ttpos order`) or recharge/top-up orders (`ttpos recharge`) — those are separate skills. `--shop` resolution (uuid/别名/商户名前缀、四级上下文兜底) is documented once in `ttpos-shared`, not repeated here.
+description: Use this skill when the user (or an agent) needs to look up TTPOS shop member orders (会员订单/会员消费单) via the `ttpos` CLI — list a shop's member orders within a date range/status/order-no filter, or fetch a single member order's full detail by `member_sale_order_uuid` (return info is not available in this version). Applies to questions like "查一下今天的会员订单"、"这个会员账号今天下了几单". Do not use for regular sales orders (`ttpos order`) or recharge/top-up orders (`ttpos recharge`) — those are separate skills. `--shop` resolution (uuid/别名/商户名前缀、四级上下文兜底) is documented once in `ttpos-shared`, not repeated here.
 ---
+> **v1 未提供** `member-order return-info`：上游在查询时会对订单加锁，可能与收银端的真实退货操作冲突，本版本不提供。不要尝试调用；需要时请人工在商户后台查看。
+
 
 # ttpos-member-order
 
-`ttpos member-order list` / `ttpos member-order get` / `ttpos member-order
-return-info` 通过本地 gateway 查询 TTPOS 商户的会员订单。三者都要求先完成
+`ttpos member-order list` / `ttpos member-order get` 通过本地 gateway 查询 TTPOS 商户的会员订单。两者都要求先完成
 `ttpos auth login`（见 README「`auth login` 三步」），未登录
 直接 exit 3，不发起网络请求。
 
@@ -91,23 +92,13 @@ ttpos member-order get 9007199254740993 --shop <商户uuid> --format json
   做字段裁剪、重命名或数值中转（不经 `map[string]any`/`float64`），
   `--format table` 下也是直接打印这段原始 JSON，不额外渲染表格。
 
-## `ttpos member-order return-info`
-
-```bash
-ttpos member-order return-info 9007199254740993 --shop <商户uuid>
-```
-
-- 用法与 `get` 完全一致（同一个位置参数、同一组 flag），只是打到上游的
-  `member_order/return_info` 端点，返回该笔会员订单的退货信息原文，同样
-  原样透传、不建模。**只读查询**，不执行任何退货操作。
-
 ## 退出码
 
 | 退出码 | 触发条件 |
 |---|---|
 | `0` | 成功 |
 | `1` | 一般错误：上游/gateway 业务错误（含 `SHOP_NOT_IN_SCOPE` 403） |
-| `2` | 用法错误：位置参数数量不符（`get`/`return-info` 缺 `<uuid>`）、未知 flag、flag 值解析失败（cobra 层，统一为 exit 2 + JSON 信封）；`--shop` 解析失败（四级上下文全空、标识无效、0 命中、多命中歧义——详见 `ttpos-shared`）、`--from`/`--to` 非 `YYYY-MM-DD`、`--format` 取值非法 |
+| `2` | 用法错误：位置参数数量不符（`get` 缺 `<uuid>`）、未知 flag、flag 值解析失败（cobra 层，统一为 exit 2 + JSON 信封）；`--shop` 解析失败（四级上下文全空、标识无效、0 命中、多命中歧义——详见 `ttpos-shared`）、`--from`/`--to` 非 `YYYY-MM-DD`、`--format` 取值非法 |
 | `3` | 未认证：本地无 token、上游会话过期需重新 `ttpos auth login`，或 `--shop` 解析需要拉商户列表但未登录 |
 
 ## 输出契约
@@ -125,12 +116,9 @@ stderr。`--format json|table` 可显式覆盖自动判断。`resolved_shop` 字
   `order`/`recharge` 两域的默认窗口语义不同，务必看清上面「⚠️ 默认窗口」
   一节再解读"没查到数据"的结果。
 - **item 字段未经真实数据验证**：探测时使用的测试商户（`<商户uuid>`）
-  没有会员订单数据，`list`/`get`/`return-info` 的字段形状（含 detail/
-  return-info 的完整结构）均以上游 DTO 定义
+  没有会员订单数据，`list`/`get` 的字段形状（含 detail 的完整结构）均以上游 DTO 定义
   为准，**未拿真实响应核对过**。首个有会员订单数据的商户接入时需要人
   工复核一次字段是否与 DTO 一致，如有出入以实测为准并回来更新本文档。
 - `--status` 过滤值和 `member-order list` 表格里的状态列都是原始字符串状
   态码，未映射为可读文字。
-- `member-order get`/`return-info` 输出未建模的原始 JSON，字段需自行对照
-  上游文档或 DTO 源码解读。
 - 只覆盖会员订单本身，不含会员账户资料、会员等级、积分等其他会员域数据。

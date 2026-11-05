@@ -1,6 +1,6 @@
 ---
 name: ttpos-setting
-description: Use this skill when the user (or an agent) needs to read a TTPOS shop's configuration snapshot via the `ttpos` CLI — business rules, cashier secondary-screen display, payment switches, kiosk (self-order machine) config, kitchen display settings, or print copy settings. Applies to questions like "这个门店的营业设置"、"收银副屏轮播配了什么"、"支付方式开了哪些"、"自助点餐机密码是多少"、"厨显等待颜色区间"、"打印联数怎么配的". Do not use for writing/changing settings (this CLI is read-only for setting) or for门店基础信息/base——those are out of scope. `--shop` resolution (uuid/别名/商户名前缀、四级上下文兜底) is documented once in `ttpos-shared`, not repeated here.
+description: Use this skill when the user (or an agent) needs to read a TTPOS shop's configuration snapshot via the `ttpos` CLI — business rules, cashier secondary-screen display, payment switches, kiosk (self-order machine) config, kitchen display settings, or print copy settings. Applies to questions like "这个门店的营业设置"、"收银副屏轮播配了什么"、"支付方式开了哪些"、"厨显等待颜色区间"、"打印联数怎么配的". Do not use for writing/changing settings (this CLI is read-only for setting) or for门店基础信息/base——those are out of scope. `--shop` resolution (uuid/别名/商户名前缀、四级上下文兜底) is documented once in `ttpos-shared`, not repeated here.
 ---
 
 # ttpos-setting
@@ -54,24 +54,16 @@ permission-group` 先例，**恒定输出 JSON**（即使在 TTY 下），建议
 | `business` | `setting/business` | 53 | 布尔字段绝大多数是字符串 `"0"/"1"`，**唯一例外** `invoice_decimal_setting_editable` 是真 `bool`（已逐字段核实，非推断）；另含 4 个 `[]uint64` 大整数数组（`batch_product_uuids`/`discount_authorized_staff_ids`/`refund_authorized_staff_ids`/`change_salesperson_authorized_staff_ids`） |
 | `cashier` | `setting/cashier` | 5 | handler 裁剪后**仅副屏子集**（`carousel`/`no_order_carousel_interval`/`order_display_mode`/`order_carousel`/`order_carousel_interval`），不是完整收银机配置 |
 | `payment` | `setting/payment` | 5 | 混用：`is_cash`/`is_balance`/`is_other` 是字符串 `"0"/"1"`，但 `payment_strategy`/`skip_payment_enabled` 是 **int** |
-| `kiosk` | `setting/kiosk` | 6 | `call_waiter_enabled` 是 **int**；含 **`advanced_password`** 敏感字段，见下方警告 |
+| `kiosk` | `setting/kiosk` | 6 | `call_waiter_enabled` 是 **int**；`advanced_password` 恒遮蔽为 `"***"`，见下方说明 |
 | `kitchen` | `setting/kitchen` | 11 | 布尔字段清一色字符串 `"0"/"1"`（`is_open`/`is_come_dish`/`is_call_service`/`is_wait_color`/`is_smart_kitchen`） |
 | `print` | `setting/print_setting/get` | 2 | `enable_custom_copies` 是字符串 `"0"/"1"`，`checkout_slip_copies` 是可空 `*int`（`nil` 表示未设置）——同一端点两个字段形态不同 |
 
-## ⚠️ kiosk 敏感字段警告
+## kiosk 高级密码：已恒遮蔽
 
-**`ttpos setting get kiosk` 的 `data.advanced_password` 是自助点餐机高级
-密码的明文原值，不是脱敏/哈希后的占位符。** 这是上游接口的既有行为——任
-何拿到有效商户 token 的管理端客户端都会收到同样的明文，不是本 CLI 引入
-的。
-
-CLI 侧选择**如实透传、不修改数据**：数据已经从上游下发，CLI 单独遮蔽只
-是装饰性的、不解决问题，反而会用"CLI 输出看起来更安全"的错觉掩盖上游的
-真实行为。
-
-**因此**：`kiosk` 快照的输出**不要**粘贴到公开场合、聊天记录、issue、日
-志或任何会被非授权人看到的地方；agent 消费该字段时同样要当作敏感凭据处
-理（不回显在对话历史、不写入非受控文件）。
+上游 `setting/kiosk` 会下发自助点餐机高级密码的明文。本 CLI 在输出前把
+`data.advanced_password` **恒定替换为 `"***"`**，加 `--reveal` 也不会放开
+（规则见 `ttpos-shared`「敏感信息」）。该字段在输出里只能说明"有这个键"，
+CLI 无法用来查看或核对密码；需要密码的人请走商户后台。
 
 ## 布尔字段三态（跨域现状，不是本命令独有）
 
@@ -114,8 +106,8 @@ CLI 侧选择**如实透传、不修改数据**：数据已经从上游下发，
 - **`store` type 不存在**：上游只有保存门店设置的写端点，没有对应的读端
   点（实测 `GET setting/store` 返回 404），因此 `ttpos setting get store`
   不存在。
-- **`kiosk.advanced_password` 明文透传**：见上方「⚠️ kiosk 敏感字段警
-  告」，本 CLI 不做遮蔽。
+- **`kiosk.advanced_password` 恒遮蔽**：输出恒为 `"***"`，见上方「kiosk
+  高级密码：已恒遮蔽」。
 - **`setting/cashier`/`setting/print_setting/get` 是裁剪后的子集**：上游
   内部有更完整的 `CashierResp`/`Printer` 结构，但这两个端点的 handler 只
   回填其中一部分字段（副屏 5 个、自定义打印联数 2 个），本 CLI 只能拿到

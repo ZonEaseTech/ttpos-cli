@@ -1,11 +1,13 @@
 ---
 name: ttpos-staff
-description: Use this skill when the user (or an agent) needs to look up TTPOS shop staff accounts, roles or permission trees via the `ttpos` CLI — list a shop's staff (with optional keyword filter), fetch a single staff account's full detail by uuid, search a single staff by email/phone, list/get roles, or dump the full permission tree. Applies to questions like "这个门店有哪些员工"、"谁是超管"、"这个员工账号详情"、"这个邮箱对应哪个员工"、"这个商户有哪些角色"、"这个角色有哪些权限". Do not use for orders, products, desks, or member accounts — those are separate skills/out of scope. `--shop` resolution (uuid/别名/商户名前缀、四级上下文兜底) is documented once in `ttpos-shared`, not repeated here — load that skill alongside this one if the question involves how `--shop` is identified rather than what staff/role filters do.
+description: Use this skill when the user (or an agent) needs to look up TTPOS shop staff accounts, roles or permission trees via the `ttpos` CLI — list a shop's staff (with optional keyword filter), fetch a single staff account's full detail by uuid, list/get roles, or dump the full permission tree. Applies to questions like "这个门店有哪些员工"、"谁是超管"、"这个员工账号详情"、"这个商户有哪些角色"、"这个角色有哪些权限". Searching staff by email/phone is not available in this version. Do not use for orders, products, desks, or member accounts — those are separate skills/out of scope. `--shop` resolution (uuid/别名/商户名前缀、四级上下文兜底) is documented once in `ttpos-shared`, not repeated here — load that skill alongside this one if the question involves how `--shop` is identified rather than what staff/role filters do.
 ---
+> **v1 未提供** `staff search`（按邮箱/手机号查人）：上游会跨商户返回身份信息，本版本不提供该命令。不要尝试调用；需要时请人工在商户后台查看。
+
 
 # ttpos-staff
 
-`ttpos staff list` / `ttpos staff get` / `ttpos staff search` /
+`ttpos staff list` / `ttpos staff get` /
 `ttpos staff role list` / `ttpos staff role get` /
 `ttpos staff permission-group` 通过本地 gateway 查询 TTPOS 商户的员工账
 号、角色与权限树。全部要求先完成 `ttpos auth login`（见
@@ -67,48 +69,6 @@ ttpos staff get 3745748940230657 --shop <商户uuid> --format json
   JSON，不额外渲染表格。未建模的裸 JSON（含 `is_super` 等字段的原始取
   值），字段含义需结合上游员工详情接口文档自行解读。
 
-## `ttpos staff search`
-
-```bash
-ttpos staff search --shop <商户uuid> --field email --keyword dev
-ttpos staff search --shop <商户uuid> --field phone --keyword 138xxxx
-```
-
-按 email 或 phone 搜索单个员工，返回**单对象，不是列表**（区别于
-`staff list`）。
-
-| flag | 必填 | 说明 |
-|---|---|---|
-| `--shop` | 否 | 同上，解析规则见 `ttpos-shared` |
-| `--field` | 是 | 仅支持 `email`\|`phone`，其它取值客户端直接判定用法错误（exit 2，不发起网络请求） |
-| `--keyword` | 是 | 搜索关键字；`--field`/`--keyword` 任一缺省同样 exit 2 |
-| `--format` | 否 | `json`\|`table` |
-
-- **`--keyword` 是精确匹配，不是模糊/前缀匹配**：端到端冒烟实测，
-  `--keyword` 必须是**完整**邮箱或手机号才能命中（如 `dev` 这种部分词不
-  会命中完整邮箱 `dev@xxx.com` 对应的员工），不要按"包含匹配"预期传参。
-- **原样透传**：`data` 是上游返回的原始 JSON，实测形状为
-  `{uuid,email,phone,real_name,company_list}`，`--format table` 下也直接
-  打印这段 JSON，不额外渲染表格。
-- **`uuid` 是 JSON number，不是字符串**（修正：此前文档误
-  记为字符串）——上游 `SearchStaffResp.Uuid` 是 `uint64`，本命令对应的 gateway handler
-  （`handleStaffSearch`）只做原样透传、不经 `stringifyBigInts` 字符串化，
-  wire 上就是标准 gin JSON 编码的数值。冒烟实测完整邮箱命中示例：
-  `uuid` 为数字 `8786685202432000`（无引号）。**>2^53（JS/float64 安全整
-  数上限）的 uuid 在 JS/浏览器等消费方会有精度损失**，这是该字段未字符
-  串化的已知局限，需要精确值的消费方应改走上游/其它已字符串化的接口。
-- **无匹配时不是错误，是 `uuid=0` 的空对象**：端到端冒烟实测，关键字未
-  命中任何员工时，上游/gateway/CLI 全链路都不报错（exit 0），`data` 是
-  一个 `uuid` 为数字 `0`、其余字段为空值的对象——上游 DTO 注释原文是
-  "员工UUID，大于0表示找到员工"，调用方/agent 必须显式检查 `uuid == 0`（数字比较，不是字符
-  串 `"0"`）来判断"未命中"，不能只凭 exit code 或"是否报错"判断。
-- **`company_list` 结构按 DTO 补全**（M2）：上游
-  `SearchStaffCompanyInfo` 定义为
-  `{company_uuid uint64, company_name string, roles []{uuid uint64, name string}, is_super int}`
-  ——同 `uuid` 字段，`company_uuid`/`roles[].uuid` 也是原生 JSON number，
-  未经字符串化，同样有 >2^53 精度风险；该结构来自 DTO 源码，未经真实数
-  据核实每个字段在生产环境的实际取值。
-
 ## `ttpos staff role list`
 
 ```bash
@@ -156,8 +116,8 @@ is_show,children:[...]}` 递归嵌套，`uuid` 为大整数（实测样本
 |---|---|
 | `0` | 成功 |
 | `1` | 一般错误：上游/gateway 业务错误（含 `SHOP_NOT_IN_SCOPE` 403） |
-| `2` | 用法错误：位置参数数量不符（`staff get`/`role get` 缺 `<uuid>`）、未知 flag、flag 值解析失败（cobra 层，统一为 exit 2 + JSON 信封）；`--shop` 解析失败（详见 `ttpos-shared`）、`--format` 取值非法、`staff search` 的 `--field`/`--keyword` 缺省或 `--field` 非 `email`/`phone` |
-| `3` | 未认证：本地无 token、上游会话过期需重新 `ttpos auth login`；**未登录 + `staff search` 的 `--field`/`--keyword` 域参数非法同时命中时是 exit 3（AUTH 优先）**——该校验放在 `AfterAuth` 钩子（`LoadToken` 成功之后）。`get`/`role get` 缺位置参数走 cobra 层，在 `LoadToken` 之前拦下，未登录 + 缺位置参数是 exit 2，不是 3 |
+| `2` | 用法错误：位置参数数量不符（`staff get`/`role get` 缺 `<uuid>`）、未知 flag、flag 值解析失败（cobra 层，统一为 exit 2 + JSON 信封）；`--shop` 解析失败（详见 `ttpos-shared`）、`--format` 取值非法 |
+| `3` | 未认证：本地无 token、上游会话过期需重新 `ttpos auth login`。`get`/`role get` 缺位置参数走 cobra 层，在 `LoadToken` 之前拦下，未登录 + 缺位置参数是 exit 2，不是 3 |
 
 ## 输出契约
 
@@ -169,18 +129,10 @@ stderr。`resolved_shop` 字段与 `--shop` 解析结果的关系见 `ttpos-shar
 
 ## 已知局限
 
-- `staff get`/`staff search`/`staff role get`/`staff permission-group`
+- `staff get`/`staff role get`/`staff permission-group`
   输出均为未建模的原始 JSON，字段需自行对照上游文档解读。
 - `is_super`/`is_disable` 是原生 0/1 整数字段，agent/脚本消费 JSON 时若按
   bool 反序列化会出错或吞掉数据，必须按 `== 1` 判断。
-- `staff search` 返回的 `company_list` 结构按上游
-  DTO 定义补全（见「`ttpos staff search`」一节），未经真实数据逐字段核实。
-- `staff search` 的 `uuid`（及 `company_list[].company_uuid`/`roles[].uuid`）
-  是原生 JSON number，未经 gateway 字符串化，`>2^53` 的值在 JS 消费方有
-  精度损失风险（修正：此前误记为字符串）。
-- `staff search` 的 `--keyword` 是精确匹配（须完整邮箱/手机号，部分词不
-  命中），且无匹配时返回 `uuid=0`（数字）的空对象而非错误——调用方需自
-  行判空（`uuid == 0`，数字比较），不能凭 exit code 判断是否命中。
 - `staff/supervisor_candidates` 未接入：该端点要求调用方 `company_uuid`
   归属总部（上游注释原文"仅总部 company 调用方有权访问"），测试租户是
   独立商户，无法真实验证。
