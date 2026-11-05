@@ -134,13 +134,13 @@ main() {
 	check_path
 	info ""
 	info "下一步："
-	info "  1. $BIN auth login        浏览器打开打印出的网址并登录（命令会等待，完成后退出）"
+	info "  1. $BIN auth login        自动打开浏览器；核对码与终端一致后登录（完成后自动退出）"
 	info "  2. $BIN shop use <店名>   选默认商户"
 	info "  3. $BIN order list        开始查"
 	info ""
-	info "不用另开窗口跑 gateway serve。远端/Coder 才需要："
-	info "  $BIN gateway serve --public-url https://..."
-	info "  $BIN auth login --gateway https://..."
+	info "CLI 装在远端机器（Coder/SSH）时：远端 $BIN auth login --port 7080，"
+	info "本地 ssh -L 7080:127.0.0.1:7080 <host> 或 coder port-forward <ws> --tcp 7080，"
+	info "再在本地浏览器打开终端里的链接。"
 	info ""
 	info "随时可运行 $BIN doctor 自查环境。"
 }
