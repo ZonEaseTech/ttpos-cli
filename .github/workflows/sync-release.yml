@@ -12,24 +12,33 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: sync-release
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   sync:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    env:
-      GH_TOKEN: ${{ github.token }}
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      needed: ${{ steps.check.outputs.needed }}
     steps:
       - name: 查 npm 最新版本
         id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          set -eu
           VERSION=$(npm view @ttpos/cli dist-tags.latest)
-          echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'
+          grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' <<< "$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           n=$(gh release view "v$VERSION" -R "$GITHUB_REPOSITORY" --json assets --jq '.assets | length' 2>/dev/null || echo 0)
           if [ "$n" = "5" ]; then echo "needed=false" >> "$GITHUB_OUTPUT"; echo "v$VERSION 已同步"; else echo "needed=true" >> "$GITHUB_OUTPUT"; fi
@@ -42,15 +51,18 @@ jobs:
         env:
           VERSION: ${{ steps.check.outputs.version }}
         run: |
-          set -eu
           W=$(mktemp -d)
           npm pack "@ttpos/cli@$VERSION" --pack-destination "$W" --silent
-          tar -xzf "$W"/ttpos-cli-*.tgz -C "$W"
+          tar -xzf "$W/ttpos-cli-$VERSION.tgz" -C "$W"
           B="$W/package/bundle"
-          test -f "$B/README.md" && test -f "$B/install.sh" && test -d "$B/skills"
+          test -f "$B/README.md"
+          test -f "$B/install.sh"
+          test -d "$B/skills"
           cp "$B/README.md" README.md
-          cp "$B/install.sh" install.sh && chmod +x install.sh
-          rm -rf skills && cp -r "$B/skills" skills
+          cp "$B/install.sh" install.sh
+          chmod +x install.sh
+          rm -rf skills
+          cp -r "$B/skills" skills
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md install.sh skills
@@ -63,28 +75,31 @@ jobs:
         env:
           VERSION: ${{ steps.check.outputs.version }}
         run: |
-          set -eu
-          mkdir -p "$RUNNER_TEMP/dist" "$RUNNER_TEMP/work"; cd "$RUNNER_TEMP/work"
+          mkdir -p "$RUNNER_TEMP/dist" "$RUNNER_TEMP/work"
+          cd "$RUNNER_TEMP/work"
           for pair in linux:x64:amd64 linux:arm64:arm64 darwin:x64:amd64 darwin:arm64:arm64; do
             os=${pair%%:*}; rest=${pair#*:}; narch=${rest%%:*}; goarch=${rest#*:}
-            # 入口包可见时平台包也已发布，但 CDN 可能晚几分钟
             for i in $(seq 1 40); do
               npm pack "@ttpos/cli-$os-$narch@$VERSION" --silent >/dev/null 2>&1 && break
               [ "$i" -lt 40 ] || { echo "取不到 @ttpos/cli-$os-$narch@$VERSION" >&2; exit 1; }
               sleep 15
             done
-            rm -rf x && mkdir x && tar -xzf "ttpos-cli-$os-$narch-$VERSION.tgz" -C x
-            cp x/package/bin/ttpos ./ttpos && chmod 755 ./ttpos
+            rm -rf x
+            mkdir x
+            tar -xzf "ttpos-cli-$os-$narch-$VERSION.tgz" -C x
+            cp x/package/bin/ttpos ./ttpos
+            chmod 755 ./ttpos
             tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='@0' -cf - ttpos | gzip -n > "$RUNNER_TEMP/dist/ttpos_${VERSION}_${os}_${goarch}.tar.gz"
           done
-          cd "$RUNNER_TEMP/dist" && sha256sum ./*.tar.gz | sed 's# \./# #' > SHA256SUMS
+          cd "$RUNNER_TEMP/dist"
+          sha256sum ./*.tar.gz | sed 's# \./# #' > SHA256SUMS
 
       - name: 创建 Release（已存在则更新附件）
         if: steps.check.outputs.needed == 'true'
         env:
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.check.outputs.version }}
         run: |
-          set -eu
           T="v$VERSION"
           if gh release view "$T" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$T" -R "$GITHUB_REPOSITORY" --clobber "$RUNNER_TEMP"/dist/*
@@ -93,13 +108,23 @@ jobs:
               --notes "安装：\`npm install -g @ttpos/cli\`，或见 README 的安装脚本。" "$RUNNER_TEMP"/dist/*
           fi
 
-      - name: 验收：安装脚本装到新版本
-        if: steps.check.outputs.needed == 'true'
-        env:
-          VERSION: ${{ steps.check.outputs.version }}
+  # 单独 job、只读权限：验收要运行下载来的二进制，不让它碰写权限的令牌。
+  verify:
+    needs: sync
+    if: needs.sync.outputs.needed == 'true'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      WANT: ${{ needs.sync.outputs.version }}
+    steps:
+      - name: 验收：用户命令装到新版本
         run: |
-          set -eu
-          T=$(mktemp -d)
-          HOME="$T" TTPOS_INSTALL_DIR="$T/bin" sh install.sh
-          [ "$("$T/bin/ttpos" version)" = "$VERSION" ]
-          echo "✓ 安装脚本装到 $VERSION"
+          for i in $(seq 1 20); do
+            T=$(mktemp -d)
+            curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | HOME="$T" TTPOS_INSTALL_DIR="$T/bin" sh >/dev/null 2>&1 || true
+            if [ -x "$T/bin/ttpos" ] && [ "$("$T/bin/ttpos" version)" = "$WANT" ]; then echo "✓ 安装脚本装到 $WANT"; exit 0; fi
+            sleep 30
+          done
+          echo "::error::安装脚本没有装到 $WANT"
+          exit 1
