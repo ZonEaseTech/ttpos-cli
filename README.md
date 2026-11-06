@@ -145,11 +145,14 @@ ttpos skills list
 ttpos skills read order
 ```
 
-也可以装进 agent 的 skills 目录：
+装给 agent 用（推荐全局安装，任何目录都生效；需要 Node）：
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli
+npx skills add ZonEaseTech/ttpos-cli -g -y
 ```
+
+去掉 `-g` 只装到当前项目。升级 CLI 后运行 `npx skills update -g`，让 skills 跟上。没有 Node
+时让 agent 直接读内置说明：先 `ttpos skills read shared`，再读对应业务的 skill。
 
 每个命令域一份 skill，写了参数陷阱和已知局限。`--shop` 的解析规则只写在
 [`ttpos-shared`](skills/ttpos-shared/SKILL.md) 里，和其他 skill 一起装。
@@ -157,7 +160,7 @@ npx skills add ZonEaseTech/ttpos-cli
 也可以只装需要的：
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli --skill ttpos-order --skill ttpos-shared
+npx skills add ZonEaseTech/ttpos-cli -g -y --skill ttpos-order --skill ttpos-shared
 ```
 
 ## 远端授权
