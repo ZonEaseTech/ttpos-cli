@@ -2,6 +2,9 @@
 name: ttpos-shared
 description: Use this skill whenever another ttpos-cli skill (ttpos-order, ttpos-shop, or any future one) is in play and the task touches the `--shop` flag, shop resolution, local aliases, or the default-shop context, or login (`ttpos auth login`, exit 3 未登录, remote/Coder login, agent --no-wait handoff) — e.g. "用别名查订单"、"设置默认商户"、"这个 --shop 参数能不能填名字"、"resolved_shop 是什么"、"怎么登录"、"远端机器登录". This skill documents the shared `--shop` resolution contract and the login flow; other skills assume the caller has already read it and only cover their own command-specific flags. Do not use this in isolation for command-specific questions (order filters, etc. — see the command-specific skill instead).
 ---
+> 命令的最新用法以 `ttpos <命令> --help` 为准（含示例与注意事项）；退出码、输出格式、
+> 环境变量分别见 `ttpos help exit-codes`、`ttpos help output`、`ttpos help environment`。
+
 
 # ttpos-shared
 

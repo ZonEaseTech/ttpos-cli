@@ -82,7 +82,18 @@ ttpos order list          # 开始查
 | `ttpos doctor` | 环境自查 |
 | `ttpos skills` | 内置的 agent 使用说明（与当前版本一致） |
 
-`ttpos --help` 看全部，`ttpos <命令> --help` 看细节。能查哪些商户取决于登录
+## 帮助
+
+```sh
+ttpos --help                 # 全部命令（按用途分组）与快速上手
+ttpos order list --help      # 某个命令的用法、示例与注意事项
+ttpos help exit-codes        # 帮助主题：environment / exit-codes / output / reference
+```
+
+命令或参数写错时会提示最接近的写法，例如 `ttpos order lst` 会提示
+`ttpos order list`。按 Tab 补全：`ttpos completion zsh`（或 bash / fish）。
+
+能查哪些商户取决于登录
 账号绑定了哪些商户。
 
 为保护生产系统，列表单页最多 100 条，订单类查询的时间范围最长 31 天。
