@@ -128,9 +128,11 @@ main() {
 	# 旧二进制被写坏"以及中途失败留下半个文件。
 	cp "$tmp/$BIN" "$INSTALL_DIR/.$BIN.new"
 	chmod 755 "$INSTALL_DIR/.$BIN.new"
+	# 先确认新文件能运行再替换，坏包不能覆盖能用的旧版本。
+	installed=$("$INSTALL_DIR/.$BIN.new" --version) || { rm -f "$INSTALL_DIR/.$BIN.new"; die "下载的程序无法运行，已保留原有版本"; }
 	mv -f "$INSTALL_DIR/.$BIN.new" "$INSTALL_DIR/$BIN"
 
-	info "✅ 已安装: $("$INSTALL_DIR/$BIN" --version)"
+	info "✅ 已安装: $installed"
 	check_path
 	info ""
 	info "下一步："
