@@ -126,11 +126,12 @@ main() {
 	mkdir -p "$INSTALL_DIR"
 	# 先写同目录临时文件再 mv：mv 在同一文件系统内是原子的，避免"正在运行的
 	# 旧二进制被写坏"以及中途失败留下半个文件。
-	cp "$tmp/$BIN" "$INSTALL_DIR/.$BIN.new"
-	chmod 755 "$INSTALL_DIR/.$BIN.new"
+	new=$(mktemp "$INSTALL_DIR/.$BIN.XXXXXX") || die "无法写入 $INSTALL_DIR"
+	cp "$tmp/$BIN" "$new"
+	chmod 755 "$new"
 	# 先确认新文件能运行再替换，坏包不能覆盖能用的旧版本。
-	installed=$("$INSTALL_DIR/.$BIN.new" --version) || { rm -f "$INSTALL_DIR/.$BIN.new"; die "下载的程序无法运行，已保留原有版本"; }
-	mv -f "$INSTALL_DIR/.$BIN.new" "$INSTALL_DIR/$BIN"
+	installed=$("$new" --version) || { rm -f "$new"; die "下载的程序无法运行，已保留原有版本"; }
+	mv -f "$new" "$INSTALL_DIR/$BIN"
 
 	info "✅ 已安装: $installed"
 	check_path

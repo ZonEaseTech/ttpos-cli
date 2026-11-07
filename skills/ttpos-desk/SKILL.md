@@ -1,6 +1,9 @@
 ---
 name: ttpos-desk
 description: Lists TTPOS desks and desk regions through the ttpos CLI. Use when asked 有多少张桌台, 桌台列表, 桌台区域, 某个区域下有几张桌. Not for orders, products, staff or member data, and it does not show live occupancy or reservations.
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-desk

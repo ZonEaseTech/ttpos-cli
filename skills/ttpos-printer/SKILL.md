@@ -1,6 +1,9 @@
 ---
 name: ttpos-printer
 description: Lists TTPOS print templates (打印模板, 小票模板) and their template ids through the ttpos CLI, such as 预结账单, 结账单, 税票, 外卖联, 收银员汇总. Use when asked 有哪些打印模板, 结账单模板 id 是多少. List only, with no template details or previews. Not for print copy settings (ttpos-setting print type).
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-printer

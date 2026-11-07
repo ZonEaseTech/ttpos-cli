@@ -1,6 +1,9 @@
 ---
 name: ttpos-product
 description: Looks up TTPOS products and categories through the ttpos CLI, plus units, sauces (加料), attribute groups, flavors (规格), single-spec products and tax classes. Use when asked 有哪些商品, 这个分类下有多少商品, 商品详情, 商品分类树, 商品单位, 加料, 属性分组, 规格, 税类, 税率. Not for recipes and cost cards (ttpos-bom), orders, desks or staff.
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-product

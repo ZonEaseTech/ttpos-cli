@@ -1,6 +1,9 @@
 ---
 name: ttpos-bom
 description: Looks up TTPOS recipes, BOM configuration and cost cards (配方, BOM, 成本卡) through the ttpos CLI, covering recipe modules, BOM status of products, combos and sauces, combo BOM summaries, the merchant-wide order BOM and spec-product cost cards. Use when asked 配方模块包含哪些行, 这个商品配了 BOM 吗, 这个套餐配置了哪些单品, 这个加料的 BOM, 订单 BOM, 成本卡的材料清单. Not for product lists and details (ttpos-product).
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-bom

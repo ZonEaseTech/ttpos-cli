@@ -1,6 +1,9 @@
 ---
 name: ttpos-setting
 description: Reads a TTPOS merchant's configuration snapshot through the ttpos CLI for six types, covering business rules, cashier secondary screen, payment switches, kiosk, kitchen display and print copies. Use when asked 营业设置, 收银副屏轮播配了什么, 支付开关, 自助点餐机配置, 厨显等待颜色, 打印联数怎么配的. Read only. Not for the payment method list (ttpos-payment-method) or print templates (ttpos-printer).
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-setting

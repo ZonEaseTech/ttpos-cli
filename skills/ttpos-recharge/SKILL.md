@@ -1,6 +1,9 @@
 ---
 name: ttpos-recharge
 description: 'Looks up TTPOS member recharge orders (会员充值订单) through the ttpos CLI, listing them by date range or order number, fetching one order by uuid, and reading its refundable amount without executing a refund. Use when asked 最近充值了多少笔, 充值订单详情, 这笔充值能退多少钱. Not for regular sales orders (ttpos-order) or member orders (ttpos-member-order).'
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-recharge

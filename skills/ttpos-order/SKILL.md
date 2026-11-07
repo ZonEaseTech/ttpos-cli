@@ -1,6 +1,9 @@
 ---
 name: ttpos-order
 description: Looks up TTPOS sales orders through the ttpos CLI, listing them by date range, status or 18-digit order number and fetching one order's detail by 16-digit sale_bill_uuid. Use when asked 查订单, 最近的订单, 某天的订单, 这笔订单的详情, 按订单号查, or given an order number or sale_bill_uuid. Not for member orders (ttpos-member-order) or recharge orders (ttpos-recharge).
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-order

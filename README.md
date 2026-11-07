@@ -35,10 +35,10 @@ curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.
 
 ```sh
 # 装到别处
-TTPOS_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | TTPOS_INSTALL_DIR=/usr/local/bin sh
 
 # 装指定版本
-VERSION=0.2.0 curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | VERSION=0.3.3 sh
 
 # 卸载（保留 ~/.ttpos 下的凭证与配置）
 curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh -s -- --uninstall
@@ -133,7 +133,7 @@ CLI 只发查询请求，但 TTPOS 服务端在"进入某个商户"这一步会�
 - 手机号、邮箱、税号/证件号、银行账号、详细地址默认打码（如
   `******5678`、`a***@example.com`）。
 - 需要看完整联系方式时加全局 `--reveal`；密码类字段仍然遮蔽。
-  `--reveal` 只在人明确需要时使用，不要让 agent 自行添加。
+  `--reveal` 只能由人在终端运行，并输入屏幕上显示的确认码；agent 调用会被拒绝。
 - 字符串中的终端控制字符会被去掉。
 
 ## Agent skills
@@ -145,11 +145,13 @@ ttpos skills list
 ttpos skills read order
 ```
 
-装给 agent 用（推荐全局安装，任何目录都生效；需要 Node）：
+CLI 和 skills 一起装给 agent 用（推荐全局安装，任何目录都生效；需要 Node）：
 
 ```sh
-npx skills add ZonEaseTech/ttpos-cli -g -y
+npm install -g @ttpos/cli && npx skills add ZonEaseTech/ttpos-cli -g -y
 ```
+
+agent 代办登录时，把 `ttpos auth login` 放到后台运行，把它打印的链接和核对码转给人，等它退出。
 
 去掉 `-g` 只装到当前项目。升级 CLI 后运行 `npx skills update -g`，让 skills 跟上。没有 Node
 时让 agent 直接读内置说明：先 `ttpos skills read shared`，再读对应业务的 skill。
@@ -176,6 +178,9 @@ ssh -L 7080:127.0.0.1:7080 <host>            # 本地，二选一
 
 然后在本地浏览器打开终端打印的 `http://127.0.0.1:7080/authorize?...`。
 授权页只监听回环地址，不提供公网访问方式。
+
+**防钓鱼：**端口只转发到你自己的机器，不要运行别人发来的转发命令，也不要打开别人发来的授权链接。
+页面底部会显示它来自哪台机器的哪个账号，不是你自己的就立刻关闭。
 
 ## 反馈
 

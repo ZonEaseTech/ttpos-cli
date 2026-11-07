@@ -1,6 +1,9 @@
 ---
 name: ttpos-staff
 description: Looks up TTPOS staff accounts, roles and the permission tree through the ttpos CLI, with contact details masked by default. Use when asked 有哪些员工, 谁是超管, 员工详情, 员工联系方式, 员工手机号, 有哪些角色, 这个角色有哪些权限, 权限树. Not for orders, products, desks or member data.
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-staff

@@ -1,6 +1,9 @@
 ---
 name: ttpos-payment-method
 description: Looks up TTPOS payment methods (支付方式) through the ttpos CLI, listing those a merchant has configured, showing one method's fee, per-terminal visibility and logo or QR code, and listing system defaults with whether each can still be added. Use when asked 开了哪些支付方式, 手续费多少, 收银机上显示哪些支付方式, 还能添加哪些默认支付方式. Not for payment switches in merchant settings (ttpos-setting) or an order's payments (ttpos-order).
+metadata:
+  requires:
+    bins: ["ttpos"]
 ---
 
 # ttpos-payment-method
