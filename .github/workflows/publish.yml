@@ -1,17 +1,22 @@
 name: Publish
 
 # 发布流水线。私有仓编译完成后，把成品放进草稿 Release（外部不可见）并触发本工作流；
-# 本工作流组装后发布到 npm（可信发布，无令牌，自动带来源证明），同步说明和 skills，
-# 再发布 GitHub Release。公开仓只有打包和发布，不接触源码；Actions 在公开仓免费。
+# 本工作流发布到 npm（可信发布，无令牌，自动带来源证明）并发布 GitHub Release。
 #
 # npm 上绑定了「本仓库 + publish.yml + npm-publish environment」，改名要同步改 npm。
-# 失败后在 Actions 页面重跑：已发布的包核对内容后跳过，已同步的内容不会重复提交。
-# 正本在私有仓 ttpos-cli/public/.github/，改完要手动同步到本仓库。
+# 安全边界：
+# - 只接受发版 App 触发，交接包按 sha256 校验，内容必须和私有仓的编译结果一致；
+# - 发布逻辑全部写在本文件里。App 没有 workflows 权限，改不了它；job 不 checkout，
+#   仓库里的其他文件影响不到发布。
+# 正本在私有仓 ttpos-cli/public/.github/，main 受规则保护，改动走 PR。
 on:
   workflow_dispatch:
     inputs:
       version:
         description: "版本号，如 1.2.3"
+        required: true
+      sha256:
+        description: "交接包的 sha256，由私有仓计算"
         required: true
 
 permissions:
@@ -27,7 +32,7 @@ defaults:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.actor == 'ttpos-cli-release[bot]'
     environment: npm-publish
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -36,55 +41,77 @@ jobs:
       id-token: write
     env:
       VERSION: ${{ inputs.version }}
-      GH_TOKEN: ${{ github.token }}
+      SHA256: ${{ inputs.sha256 }}
     steps:
-      - name: 校验版本号
-        run: grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' <<< "$VERSION"
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: 校验输入
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$SHA256" =~ ^[0-9a-f]{64}$ ]]
       # 不设 registry-url：它会写入令牌占位配置，干扰 OIDC。
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
       - name: 安装支持可信发布的 npm
         run: npm install -g npm@11.21.2
-      - name: 取私有仓交接的成品
+      - name: 取交接包并校验
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           W=$RUNNER_TEMP/handoff
           mkdir -p "$W"
           gh release download "v$VERSION" -R "$GITHUB_REPOSITORY" -p "handoff-$VERSION.tgz" -D "$W"
+          echo "$SHA256  $W/handoff-$VERSION.tgz" | sha256sum -c -
           tar -xzf "$W/handoff-$VERSION.tgz" -C "$W"
-          test -d "$W/npm/cli"
-          test -f "$W/bundle/README.md"
-          test -f "$W/bundle/install.sh"
-          test -d "$W/bundle/skills"
-      - name: 发布平台包并核对
+          cd "$W/npm"
+          # 只发这 5 个包，且不带任何生命周期脚本。
+          [ "$(ls | sort | tr '\n' ' ')" = "cli cli-darwin-arm64 cli-darwin-x64 cli-linux-arm64 cli-linux-x64 " ]
+          for d in *; do
+            node -e '
+              const p = require(process.argv[1]);
+              if (p.name !== "@ttpos/" + process.argv[2]) throw new Error("包名不对: " + p.name);
+              if (p.version !== process.env.VERSION) throw new Error("版本不对: " + p.version);
+              if (p.scripts && Object.keys(p.scripts).length) throw new Error("不允许带脚本: " + p.name);
+            ' "$PWD/$d/package.json" "$d"
+          done
+      - name: 发布到 npm 并核对
         working-directory: ${{ runner.temp }}/handoff
         run: |
-          sh "$GITHUB_WORKSPACE/.github/scripts/publish.sh" "$VERSION" npm/cli-*
-          sh "$GITHUB_WORKSPACE/.github/scripts/verify-published.sh" "$VERSION" npm/cli-*
-      # 平台包全部核对通过才发入口包：入口包一发，latest 就指向新版本。
-      - name: 发布入口包并核对
-        working-directory: ${{ runner.temp }}/handoff
-        run: |
-          sh "$GITHUB_WORKSPACE/.github/scripts/publish.sh" "$VERSION" npm/cli
-          sh "$GITHUB_WORKSPACE/.github/scripts/verify-published.sh" "$VERSION" npm/cli
-      - name: 同步 README、安装脚本和 skills
-        run: |
-          # 重跑时 checkout 的是当初的提交，先追上 main，否则推送会被拒。
-          git fetch -q origin main
-          git reset -q --hard FETCH_HEAD
-          B=$RUNNER_TEMP/handoff/bundle
-          cp "$B/README.md" README.md
-          cp "$B/install.sh" install.sh
-          chmod +x install.sh
-          rm -rf skills
-          cp -r "$B/skills" skills
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md install.sh skills
-          git diff --cached --quiet || git commit -q -m "release v$VERSION"
-          git push -q origin HEAD:main
+          publish() { # 已发布的版本核对内容后跳过；同版本内容不一致就失败，要升版本号。
+            local dir=$1 name; name=$(node -p "require('./$dir/package.json').name")
+            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+              echo "跳过 $name@$VERSION（已发布）"
+            else
+              echo "发布 $name@$VERSION"
+              npm publish --ignore-scripts --access public "./$dir"
+            fi
+          }
+          verify() { # registry/CDN 可能晚几分钟才可见（实测最多约 15 分钟），所以轮询。
+            local dir=$1 name tarball tmp url deadline; name=$(node -p "require('./$dir/package.json').name")
+            url="https://registry.npmjs.org/$(printf '%s' "$name" | sed 's#/#%2f#')/$VERSION"
+            deadline=$(( $(date +%s) + 1200 ))
+            while :; do
+              tarball=$(curl -fsS "$url" 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).dist.tarball)}catch{}})' || true)
+              tmp=$(mktemp -d)
+              if [ -n "$tarball" ] && curl -fsS -o "$tmp/p.tgz" "$tarball" 2>/dev/null && tar -xzf "$tmp/p.tgz" -C "$tmp"; then break; fi
+              rm -rf "$tmp"
+              [ "$(date +%s)" -lt "$deadline" ] || { echo "::error::$name@$VERSION 等待超时"; exit 1; }
+              sleep 15
+            done
+            for f in bin/ttpos bin/ttpos.js; do
+              [ -f "$dir/$f" ] || continue
+              cmp -s "$tmp/package/$f" "$dir/$f" || { echo "::error::$name@$VERSION 的 $f 与本次构建不一致，请升版本号"; exit 1; }
+            done
+            rm -rf "$tmp"
+            echo "✓ $name@$VERSION"
+          }
+          for d in npm/cli-*; do publish "$d"; done
+          for d in npm/cli-*; do verify "$d"; done
+          # 平台包全部核对通过才发入口包：入口包一发，latest 就指向新版本。
+          publish npm/cli
+          verify npm/cli
       - name: 打安装包并发布 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           D=$RUNNER_TEMP/dist
           W=$RUNNER_TEMP/handoff/npm
@@ -99,8 +126,7 @@ jobs:
           done
           rm -f ttpos
           sha256sum ./*.tar.gz | sed 's# \./# #' > SHA256SUMS
-          cd "$GITHUB_WORKSPACE"
-          SHA=$(git rev-parse HEAD)
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
           gh release upload "v$VERSION" -R "$GITHUB_REPOSITORY" --clobber "$D"/*
           gh release delete-asset "v$VERSION" "handoff-$VERSION.tgz" -R "$GITHUB_REPOSITORY" --yes || true
           gh release edit "v$VERSION" -R "$GITHUB_REPOSITORY" --draft=false --latest --target "$SHA" --title "v$VERSION" \
