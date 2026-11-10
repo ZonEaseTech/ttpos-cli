@@ -17,6 +17,16 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-10
+
+### Added
+
+- `ttpos takeout promotion`：Grab 促销里商家出资的金额，按活动汇总；`ttpos takeout dine-out`：Grab Dine Out 券的核销记录；`ttpos takeout menu`：推到外卖平台的菜单（商品、价格、推送结果）。
+- `ttpos product labels`（商品标签及关联商品数）、`ttpos product periods`（时段菜单里各商品的可售时段）。
+- `ttpos order sources`：订单来源及是否启用。
+- `ttpos staff group list/get`：销售组、组员与提成比例。
+- `ttpos setting get` 新增 6 类：`scan-order`（扫码点餐、外送与自取、配送费）、`template-style`（小票模板样式）、`free-reason`、`return-reason`（免单、退菜原因）、`order-remark`、`item-remark`（整单、单品备注预设）。
+
 ## [0.8.0] - 2026-11-10
 
 ### Added
@@ -211,7 +221,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.9.0
 [0.8.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.8.0
 [0.7.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.7.0
 [0.6.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.6.0

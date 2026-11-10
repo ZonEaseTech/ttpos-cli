@@ -19,6 +19,7 @@ metadata:
 | 某个角色有哪些权限 | `ttpos staff role get <uuid>` |
 | 谁在什么时候改了什么（改价、上下架、改设置等） | `ttpos staff log --from 2026-11-01 --to 2026-11-07` |
 | 某个员工做过哪些修改 | `ttpos staff log --staff <姓名>` |
+| 有哪些销售组、组员和提成比例 | `ttpos staff group list`，再 `ttpos staff group get <uuid>` |
 
 ## 操作日志
 

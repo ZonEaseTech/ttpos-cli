@@ -16,6 +16,8 @@ metadata:
 |---|---|
 | 某个商品多少钱、上没上架、在哪个分类 | `ttpos product list --keyword <名称>` |
 | 有哪些分类 | `ttpos product category list` |
+| 有哪些商品标签、各关联多少商品 | `ttpos product labels` |
+| 某个商品在哪些时段可售（时段菜单） | `ttpos product periods`（`--channel 2` 看 Grab） |
 | 商品的规格、加料、税类 | `ttpos product get <uuid>` |
 
 ## 命令

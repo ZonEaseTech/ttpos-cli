@@ -19,6 +19,8 @@ metadata:
 | 取消了哪些单 | `ttpos order list --status 2` |
 | 这单的明细、付款、退款情况 | `ttpos order get <sale_bill_uuid>` |
 
+有哪些订单来源（外卖来源等）、是否启用：`ttpos order sources`。
+
 ## 两种 id，别混
 
 | id | 形态 | 怎么查 |

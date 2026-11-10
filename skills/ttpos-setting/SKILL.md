@@ -1,6 +1,6 @@
 ---
 name: ttpos-setting
-description: Reads a TTPOS merchant's configuration snapshot through the ttpos CLI for six types, covering business rules, cashier secondary screen, payment switches, kiosk, kitchen display and print copies. Use when asked 营业设置, 收银副屏轮播配了什么, 支付开关, 自助点餐机配置, 厨显等待颜色, 打印联数怎么配的. Read only. Not for the payment method list (ttpos-payment-method) or print templates (ttpos-printer).
+description: Reads a TTPOS merchant's configuration snapshot through the ttpos CLI, covering business rules, cashier secondary screen, payment switches, kiosk, kitchen display, print copies, scan-to-order and delivery settings, receipt template style, and the preset free-order, food-return, order and item remark reasons. Use when asked 营业设置, 收银副屏轮播配了什么, 支付开关, 自助点餐机配置, 厨显等待颜色, 打印联数怎么配的, 扫码点餐设置, 外送配送费, 免单原因, 退菜原因, 整单备注, 单品备注. Read only. Not for the payment method list (ttpos-payment-method) or print templates (ttpos-printer).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -15,6 +15,10 @@ metadata:
 | 问题 | 命令 |
 |---|---|
 | 营业设置（营业时间、抹零等） | `ttpos setting get business` |
+| 扫码点餐、外送与自取、配送费 | `ttpos setting get scan-order` |
+| 小票模板样式 | `ttpos setting get template-style` |
+| 免单原因、退菜原因有哪些 | `ttpos setting get free-reason`、`ttpos setting get return-reason` |
+| 整单备注、单品备注的预设选项 | `ttpos setting get order-remark`、`ttpos setting get item-remark` |
 | 收银、支付、自助机、厨显、打印设置 | `ttpos setting get <类型>` |
 
 ```bash
@@ -22,7 +26,7 @@ ttpos setting get business
 ttpos setting get kiosk | jq '.data.call_waiter_enabled'
 ```
 
-- `<type>` 只能是 `business` `cashier` `payment` `kiosk` `kitchen` `print`。其他值 exit 2；`store` 也没有。
+- `<type>` 只能是 `business` `cashier` `payment` `kiosk` `kitchen` `print` `scan-order` `template-style` `free-reason` `return-reason` `order-remark` `item-remark`。其他值 exit 2；`store` 也没有。
 - 只输出 JSON，没有表格。`data` 是原始配置。
 - **密码类恒为 `***`**：如 `kiosk` 的 `advanced_password`，`--reveal` 也不显示。这个字段只说明有这个键，不能用来查看或核对密码，需要时请用户到商户后台查看。
 

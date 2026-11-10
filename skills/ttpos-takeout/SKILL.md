@@ -22,6 +22,9 @@ metadata:
 | 现在还有哪些外卖单没完成 | `ttpos takeout active` |
 | 一张外卖单的商品和金额 | `ttpos takeout get <uuid>` |
 | Grab 有没有开、有没有绑定、菜单最近什么时候推送的 | `ttpos takeout status --platform grab` |
+| Grab 促销我们出了多少钱、哪个活动花得最多 | `ttpos takeout promotion --date this-month` |
+| Grab Dine Out 券核销了多少 | `ttpos takeout dine-out --date this-week`（`--code` 按券码查） |
+| 推到外卖平台的菜单有哪些商品、价格、推送成功没有 | `ttpos takeout menu`（`--platform lineman`） |
 
 ## 读结果
 
@@ -32,4 +35,4 @@ metadata:
 
 ## 做不到的
 
-外卖菜单内容、促销活动、营业时间、商品上下架目前不支持，如实告诉用户，并按 `ttpos-shared` 的规则询问是否反馈需求。
+外卖促销活动列表、营业时间、外卖商品上下架目前不支持，如实告诉用户，并按 `ttpos-shared` 的规则询问是否反馈需求。
