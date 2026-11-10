@@ -1,6 +1,6 @@
 ---
 name: ttpos-member-order
-description: Looks up TTPOS member orders (会员订单, 会员消费单) through the ttpos CLI, listing them by date range, status or order number and fetching one order's detail by member_sale_order_uuid. Use when asked 查会员订单, 今天的会员订单, 这笔会员订单的详情. Not for regular sales orders (ttpos-order) or recharge orders (ttpos-recharge).
+description: Looks up TTPOS member orders (会员订单, 会员消费单) through the ttpos CLI, listing them by date range, status or order number fetching one order's detail by member_sale_order_uuid, and summing delivery and platform fees for a period. Use when asked 查会员订单, 今天的会员订单, 这笔会员订单的详情, 配送费多少, 平台抽成. Not for regular sales orders (ttpos-order) or recharge orders (ttpos-recharge).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -17,6 +17,7 @@ metadata:
 | 今天的外送订单 | `ttpos member-order list` |
 | 配送中的外送单 | `ttpos member-order list --status delivery` |
 | 一笔外送单的详情 | `ttpos member-order get <uuid>` |
+| 一段时间的配送费、平台费、结算金额 | `ttpos member-order delivery-fees --from 2026-11-01 --to 2026-11-10`（`--mode self` 只看自配送） |
 
 ## `ttpos member-order list`
 

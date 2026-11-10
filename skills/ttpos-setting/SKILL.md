@@ -1,6 +1,6 @@
 ---
 name: ttpos-setting
-description: Reads a TTPOS merchant's configuration snapshot through the ttpos CLI, covering business rules, cashier secondary screen, payment switches, kiosk, kitchen display, print copies, scan-to-order and delivery settings, receipt template style, and the preset free-order, food-return, order and item remark reasons. Use when asked 营业设置, 收银副屏轮播配了什么, 支付开关, 自助点餐机配置, 厨显等待颜色, 打印联数怎么配的, 扫码点餐设置, 外送配送费, 免单原因, 退菜原因, 整单备注, 单品备注. Read only. Not for the payment method list (ttpos-payment-method) or print templates (ttpos-printer).
+description: Reads a TTPOS merchant's configuration snapshot through the ttpos CLI, covering business rules, cashier secondary screen, payment switches, kiosk, kitchen display, print copies, scan-to-order and delivery settings, receipt template style, the preset free-order, food-return, order and item remark reasons, and menu and settings sync tasks. Use when asked 营业设置, 收银副屏轮播配了什么, 支付开关, 自助点餐机配置, 厨显等待颜色, 打印联数怎么配的, 扫码点餐设置, 外送配送费, 免单原因, 退菜原因, 整单备注, 单品备注, 同步任务失败了没有. Read only. Not for the payment method list (ttpos-payment-method) or print templates (ttpos-printer).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -20,6 +20,7 @@ metadata:
 | 免单原因、退菜原因有哪些 | `ttpos setting get free-reason`、`ttpos setting get return-reason` |
 | 整单备注、单品备注的预设选项 | `ttpos setting get order-remark`、`ttpos setting get item-remark` |
 | 收银、支付、自助机、厨显、打印设置 | `ttpos setting get <类型>` |
+| 总部同步到门店的菜单、设置有没有成功 | `ttpos setting sync-tasks`（`--status 2` 只看失败），再 `ttpos setting sync-task <task_uuid>` 看明细 |
 
 ```bash
 ttpos setting get business

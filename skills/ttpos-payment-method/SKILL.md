@@ -16,6 +16,7 @@ metadata:
 |---|---|
 | 这家店开了哪些支付方式、是否启用 | `ttpos payment-method list` |
 | 还能添加哪些系统支付方式 | `ttpos payment-method default` |
+| 各支付方式的手续费率、固定费用、是否扣减 | `ttpos payment-method fees` |
 
 ```bash
 ttpos payment-method list --page 2 --size 100

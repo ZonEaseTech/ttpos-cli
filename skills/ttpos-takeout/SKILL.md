@@ -1,6 +1,6 @@
 ---
 name: ttpos-takeout
-description: Looks up TTPOS third-party delivery (Grab, LINE MAN) orders and platform connection status through the ttpos CLI - finished orders for a business day or date range, orders still in progress, one order's items and amounts, and whether a platform is enabled, bound and when the menu was last pushed. Use when asked 外卖订单, Grab 订单, LINE MAN 订单, 外卖取消单, 还有哪些外卖没送完, 外卖单详情, Grab 接好了没, 菜单推送. Not for dine-in orders (ttpos-order) or member delivery orders placed in the TTPOS member app (ttpos-member-order).
+description: Looks up TTPOS third-party delivery (Grab, LINE MAN) orders and platform connection status through the ttpos CLI - finished orders for a business day or date range, orders still in progress, one order's items and amounts, whether a platform is enabled, bound and when the menu was last pushed, the pushed menu, Grab promotion spend, Dine Out redemptions and promotion change history. Use when asked 外卖订单, Grab 订单, LINE MAN 订单, 外卖取消单, 还有哪些外卖没送完, 外卖单详情, Grab 接好了没, 菜单推送, Grab 促销花了多少, Dine Out 核销, 谁改了外卖活动. Not for dine-in orders (ttpos-order) or member delivery orders placed in the TTPOS member app (ttpos-member-order).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -25,6 +25,7 @@ metadata:
 | Grab 促销我们出了多少钱、哪个活动花得最多 | `ttpos takeout promotion --date this-month` |
 | Grab Dine Out 券核销了多少 | `ttpos takeout dine-out --date this-week`（`--code` 按券码查） |
 | 推到外卖平台的菜单有哪些商品、价格、推送成功没有 | `ttpos takeout menu`（`--platform lineman`） |
+| 谁建、改、停了外卖促销活动 | `ttpos takeout campaign-log`，再 `ttpos takeout campaign <campaign_uuid>` 看活动详情 |
 
 ## 读结果
 

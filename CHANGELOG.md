@@ -17,6 +17,16 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-10
+
+### Added
+
+- `ttpos member-order delivery-fees`：会员外送单的配送费、平台费、结算金额汇总（默认今天，可按下单或支付时间、配送方式筛选）。
+- `ttpos member summary`：单个会员的余额、积分、等级与最近消费门店；`ttpos member setting`：积分规则。
+- `ttpos payment-method fees`：各支付方式的手续费配置。
+- `ttpos bom log`：配方修改记录；`ttpos product period-log`：时段菜单修改记录；`ttpos takeout campaign-log`、`ttpos takeout campaign`：外卖促销活动的操作记录与详情。
+- `ttpos setting sync-tasks`、`ttpos setting sync-task`：总部同步到门店的任务及每项结果。
+
 ## [0.9.0] - 2026-11-10
 
 ### Added
@@ -221,7 +231,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.10.0
 [0.9.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.9.0
 [0.8.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.8.0
 [0.7.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.7.0

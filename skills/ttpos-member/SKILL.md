@@ -1,6 +1,6 @@
 ---
 name: ttpos-member
-description: Looks up TTPOS members through the ttpos CLI - searching by phone number, member number, nickname or card number, reading a member's balance, gift balance, points, level and lifetime spending, and listing their consumption, recharge and points history. Use when asked 查会员, 会员余额, 余额还有多少, 积分, 会员等级, 会员消费记录, 充值记录, 这个手机号是不是会员. Not for member delivery orders (ttpos-member-order) or recharge orders with refundable amounts (ttpos-recharge).
+description: Looks up TTPOS members through the ttpos CLI - searching by phone number, member number, nickname or card number, reading a member's balance, gift balance, points, level and lifetime spending, listing their consumption, recharge and points history, and reading the points rules. Use when asked 查会员, 会员余额, 余额还有多少, 积分, 会员等级, 会员消费记录, 充值记录, 这个手机号是不是会员, 积分规则. Not for member delivery orders (ttpos-member-order) or recharge orders with refundable amounts (ttpos-recharge).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -28,6 +28,8 @@ metadata:
 | 充值最多、消费最多的会员 | `ttpos member recharge-rank`、`ttpos member consume-rank --by 2` |
 | 一段时间内谁的积分、余额有变动 | `ttpos member points` / `ttpos member balances --from ... --to ...`（`--keyword` 指定会员，`--scene` 指定场景） |
 | 有哪些会员卡、谁持有、什么时候到期 | `ttpos member card-types`、`ttpos member cards --status 1` |
+| 某个会员最近在哪家门店消费 | `ttpos member summary <member_uuid>` |
+| 积分怎么送、怎么抵扣、多久过期 | `ttpos member setting` |
 
 这些是列表，手机号和昵称打码；要看某个会员的完整信息，用 `member get <member_uuid>`。门店没开启会员功能或账号没有对应权限时会报错，如实转告。
 
