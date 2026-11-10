@@ -91,9 +91,17 @@ ttpos shop alias <名称> <uuid>     # 设别名（不能纯数字），只存�
 
 ## 登录
 
-未登录或登录失效 exit 3（`AUTH_REQUIRED`/`AUTH_EXPIRED`），让人完成登录。确认身份用 `ttpos auth status`。查询不需要常驻服务。
+两套账号互不依赖，**按要用的命令决定登录哪个**：
 
-有两套账号：商户账号（`ttpos auth login`，查所有门店数据）和云平台账号（`ttpos auth login --cloud`，只用来查门店授权到期，登录有效 10 小时）。错误提示里写了 `--cloud` 时让人登录云平台。
+| 账号 | 登录命令 | 用于 | 有效期 |
+|---|---|---|---|
+| 商户账号 | `ttpos auth login` | 门店到期以外的所有命令 | 30 天 |
+| 云平台账号 | `ttpos auth login --cloud` | 只有 `ttpos shop expiry`（加 `--mine` 时两个都要） | 10 小时，不能续期，过期重新登录 |
+
+- 用户只问门店到期，直接运行 `ttpos shop expiry`。不要先跑 `auth status`、`doctor`、`shop list`，也不要让他登录商户账号。
+- exit 3（`AUTH_REQUIRED`/`AUTH_EXPIRED`）时，按错误里的 `hint` 让人登录**那一个**账号，不要换成另一个账号的登录命令，也不要两个都要求。
+- `ttpos auth status` 同时显示两个账号，有一个有效就 exit 0：`data.username` 是商户账号，`data.cloud_username` 是云平台账号，只看你要用的那个。
+- 查询不需要常驻服务。
 
 ```bash
 ttpos auth login               # 人在本机终端：自动开浏览器，核对码一致后登录

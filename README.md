@@ -71,9 +71,11 @@
 请帮我安装 TTPOS 命令行工具并登录：
 1. 运行 npm install -g @ttpos/cli && npx skills add ZonEaseTech/ttpos-cli -g -y
 2. 运行 ttpos --version 确认安装成功
-3. 把 ttpos auth login 放到后台运行，把它打印的授权链接和核对码发给我；我在浏览器里登录后，等命令自己退出
-4. 运行 ttpos shop list，列出我能查看的商户
-之后我问商户数据时，先读 ttpos-shared 技能再查。
+3. 问我用哪种账号登录，再把对应命令放到后台运行，把它打印的授权链接和核对码发给我；我在浏览器里登录后，等命令自己退出：
+   - 商户账号（查营业、订单、会员等门店数据）：ttpos auth login
+   - 云平台账号（只查门店授权到期）：ttpos auth login --cloud
+4. 商户账号登录后运行 ttpos shop list；云平台账号登录后运行 ttpos shop expiry
+之后我问 TTPOS 的数据时，先读 ttpos-shared 技能再查；只有用到另一种账号的命令时，才让我登录那个账号。
 ```
 
 登录必须由你本人在浏览器里完成，AI 助手不会、也不应该替你输入密码。
@@ -99,6 +101,15 @@ ttpos auth login         # 打开浏览器，核对码与终端一致后输入 T
 ttpos shop use <店名>     # 设默认门店，之后的命令不用再指定门店
 ttpos stats business     # 今天的总销售额、实收金额、订单数
 ```
+
+两种账号互不依赖，用哪个登哪个：
+
+| 账号 | 登录 | 能查 | 有效期 |
+| --- | --- | --- | --- |
+| 商户账号 | `ttpos auth login` | 门店到期以外的全部内容 | 30 天 |
+| 云平台账号 | `ttpos auth login --cloud` | 门店授权到期（`ttpos shop expiry`） | 10 小时 |
+
+`ttpos auth status` 同时显示两个账号的登录状态。
 
 ### 常见问题怎么问
 

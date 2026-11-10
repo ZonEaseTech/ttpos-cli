@@ -17,6 +17,18 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-10
+
+### Changed
+
+- **BREAKING** `ttpos auth status` 同时报告商户账号和云平台账号，只登录了云平台也返回成功（退出码 0）；两个都没登录才是退出码 3。迁移：要判断商户账号是否登录，看输出里有没有 `data.username`（云平台账号是 `data.cloud_username`），不要只看退出码。
+- `ttpos doctor` 在只登录了云平台账号时给出提示，不再报登录失败。
+- 安装说明改为先问用哪种账号登录；内置技能写明两种账号各管哪些命令，只问门店到期时不再要求登录商户账号。
+
+### Fixed
+
+- 只登录了云平台账号时运行查门店数据的命令，错误提示会说明这条命令要用商户账号、云平台账号只能查门店到期，不再只显示「未登录」。
+
 ## [0.10.0] - 2026-11-10
 
 ### Added
@@ -231,7 +243,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.11.0
 [0.10.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.10.0
 [0.9.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.9.0
 [0.8.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.8.0
