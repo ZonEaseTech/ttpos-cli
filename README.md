@@ -18,7 +18,7 @@
 
 | 业务域 | 命令与能查到的内容 |
 | --- | --- |
-| **经⁠营** | `ttpos stats`<br>总销售额、实收金额、营业收入、订单数、客单价、退款与取消单；名下各门店对比；热销菜品；各支付方式收入；员工业绩与提成 |
+| **经⁠营** | `ttpos stats`<br>总销售额、实收金额、营业收入、订单数、客单价、退款与取消单；逐日明细；各渠道（堂食、外带、Grab、LINE MAN）；商品分类与桌台区域销售；名下各门店对比；热销菜品；各支付方式收入；员工业绩与提成 |
 | **订⁠单** | `ttpos order`<br>按日期、订单号、状态查门店订单；订单明细、付款与退款记录 |
 | **外⁠送⁠订⁠单** | `ttpos member-order`<br>会员在线下单的外送订单：配送状态与详情 |
 | **外⁠卖** | `ttpos takeout`<br>Grab、LINE MAN 的外卖订单（已结束和进行中）、订单详情；平台是否开启和绑定、菜单最近一次推送 |
@@ -105,6 +105,7 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | 上个月卖了多少 | `ttpos stats business --date last-month` |
 | 名下哪家店昨天卖得最好 | `ttpos stats shops --date yesterday` |
 | 本周最畅销的菜 | `ttpos stats products --date this-week` |
+| 这个月每天卖了多少 | `ttpos stats daily --date this-month` |
 | 今天 Grab 取消了哪些单 | `ttpos takeout orders --platform grab --status 60` |
 | 谁改了价格 | `ttpos staff log --title 改价` |
 | 查一张订单 | `ttpos order list --order-no <订单号>` |
@@ -239,4 +240,4 @@ curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.
 ttpos feedback "希望能查交班报表"
 ```
 
-AI 助手遇到做不到的事，会先问你要不要反馈，你同意后它才会发送。也可以提 [Issue](https://github.com/ZonEaseTech/ttpos-cli/issues)。
+AI 助手遇到做不到的事，会先问你要不要反馈，你同意后它才会发送。维护者每天处理一次反馈：能用现有能力做到的排进下一个版本，需要 TTPOS 后台提供能力的转给后台开发排期。做好的功能写进 [CHANGELOG](CHANGELOG.md)，排进计划的列在上面的「计划支持」里。也可以提 [Issue](https://github.com/ZonEaseTech/ttpos-cli/issues)。

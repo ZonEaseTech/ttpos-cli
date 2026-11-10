@@ -17,6 +17,20 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-10
+
+### Added
+
+- `ttpos stats daily`：逐日营业明细（订单金额、实付金额、单数、人数、桌数、外卖金额）。
+- `ttpos stats channels`：堂食、外带、外送、Grab、LINE MAN 等各渠道的单数与单均金额。
+- `ttpos stats areas`：各桌台区域的销售额、实收、商品数。
+- `ttpos stats categories`：各商品分类的销量和销售额。
+- 反馈闭环：`ttpos feedback` 收到的内容每天处理一次，判断后进入下一轮迭代或转给后台排期，处理记录在维护仓库的反馈记录里。
+
+### Changed
+
+- `ttpos feedback` 发送成功后说明处理节奏，以及去哪里看结果。
+
 ## [0.5.1] - 2026-11-10
 
 ### Fixed
@@ -178,7 +192,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.6.0
 [0.5.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.1
 [0.5.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.0
 [0.4.6]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.4.6

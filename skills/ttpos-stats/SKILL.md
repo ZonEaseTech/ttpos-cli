@@ -21,6 +21,10 @@ metadata:
 | 卖得最好的菜 | `ttpos stats products --date this-week`（`--by 2` 按销售额） |
 | 各支付方式收了多少 | `ttpos stats payments --date yesterday` |
 | 员工业绩、提成 | `ttpos stats commission --date this-month` |
+| 这个月每天卖了多少 | `ttpos stats daily --date this-month` |
+| 堂食、外带、Grab、LINE MAN 各多少单 | `ttpos stats channels --date this-week` |
+| 哪个商品分类卖得最好 | `ttpos stats categories --date this-month`（`--level 2` 按二级分类） |
+| 各桌台区域的销售额 | `ttpos stats areas --date yesterday` |
 
 ## 时间
 
@@ -33,6 +37,8 @@ metadata:
 - `stats business` 的字段名与后台首页「店内概况」一致：`total_sales` 总销售额，`total_received_price` 实收金额，`total_pay_price` 营业收入（= 实收金额 − 税费 + 会员余额消费），`total_order_num` 订单数，`avg_order_price` 平均每单金额，`total_people_num` 用餐人数，`total_refund_money` 退款，`total_cancel_order_num` 取消单数，`total_discount_money` 优惠，`payment_method_incomes` 各支付方式收入。
 - `business_day`、`query_range_text` 是服务端实际统计的营业日和时段。和后台或别人的数对不上时，先对这两项：时段不同，数自然不同。
 - 用户说"营业额"时口径不唯一，回答时写明用的是哪个字段：后台首页叫「总销售额 / 实收金额 / 营业收入」，就是这里的三个字段；后台「门店汇总」报表的「总营业额」是订单金额（优惠前），来自另一个报表接口，CLI 不提供，和这里的数对不上是正常的。
+- `stats daily` 的 `order_amount` 是优惠前的订单金额，`pay_amount` 是扣除退款后的实付金额，和 `stats business` 的总销售额不是同一个口径，回答时写明用的是哪个。
+- 按小时的营业时段统计不提供（对数据库开销大），被问到时如实说明并按 `ttpos-shared` 的规则询问是否反馈。
 - `total_order_num` 只算已完成的单。用户问"一共有多少笔订单"（含待付款、已取消）时用 `ttpos order list` 的 `count`；两个数不一样时都说清楚口径。
 - "客单价"在门店报表里有时指人均。用户问客单价时说明这里是"平均每单金额"；人均需要 `total_people_num`，为 0 表示没有登记人数，不要自己用订单数代替。
 - `stats shops` 逐店查询账号能访问的全部门店，门店多时要等一会儿。某家店失败时 `error` 有原因，其他店照常返回；汇报时把失败的店单独说明，不要当成 0。
