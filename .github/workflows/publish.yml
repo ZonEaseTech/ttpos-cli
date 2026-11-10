@@ -143,10 +143,16 @@ jobs:
     steps:
       - name: 验收：npm 和安装脚本都装到新版本
         run: |
+          # 刚发布时这台机器访问的 npm 节点可能还没同步到新版本（ETARGET），重试。
           T=$(mktemp -d)
-          npm install -g "@ttpos/cli@$VERSION" --prefix "$T/npm" --cache "$T/cache" --prefer-online --no-audit --no-fund
-          [ "$("$T/npm/bin/ttpos" version)" = "$VERSION" ]
-          echo "✓ npm 装到 $VERSION"
+          for i in $(seq 1 20); do
+            if npm install -g "@ttpos/cli@$VERSION" --prefix "$T/npm" --cache "$T/cache-$i" --prefer-online --no-audit --no-fund >/dev/null 2>&1 \
+              && [ "$("$T/npm/bin/ttpos" version)" = "$VERSION" ]; then
+              echo "✓ npm 装到 $VERSION"; break
+            fi
+            [ "$i" = 20 ] && { echo "::error::npm 没有装到 $VERSION"; exit 1; }
+            sleep 30
+          done
           for i in $(seq 1 20); do
             H=$(mktemp -d)
             curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | HOME="$H" TTPOS_INSTALL_DIR="$H/bin" sh >/dev/null 2>&1 || true
