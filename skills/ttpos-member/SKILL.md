@@ -29,6 +29,7 @@ metadata:
 | 一段时间内谁的积分、余额有变动 | `ttpos member points` / `ttpos member balances --from ... --to ...`（`--keyword` 指定会员，`--scene` 指定场景） |
 | 有哪些会员卡、谁持有、什么时候到期 | `ttpos member card-types`、`ttpos member cards --status 1` |
 | 某个会员最近在哪家门店消费 | `ttpos member summary <member_uuid>` |
+| 连锁里手机号重复的会员（仅总部） | `ttpos member duplicates`（`--has-balance 1` 只看有余额的；不是总部会报错，如实转告） |
 | 积分怎么送、怎么抵扣、多久过期 | `ttpos member setting` |
 
 这些是列表，手机号和昵称打码；要看某个会员的完整信息，用 `member get <member_uuid>`。门店没开启会员功能或账号没有对应权限时会报错，如实转告。

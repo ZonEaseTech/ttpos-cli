@@ -19,6 +19,7 @@ metadata:
 | 有哪些商品标签、各关联多少商品 | `ttpos product labels` |
 | 某个商品在哪些时段可售（时段菜单） | `ttpos product periods`（`--channel 2` 看 Grab） |
 | 谁改过时段菜单 | `ttpos product period-log` |
+| 有哪些分批上菜类型 | `ttpos product batch-tags` |
 | 商品的规格、加料、税类 | `ttpos product get <uuid>` |
 
 ## 命令

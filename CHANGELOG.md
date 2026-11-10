@@ -17,6 +17,21 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-10
+
+### Added
+
+- `ttpos shop devices`：叫号屏、取餐屏设备。
+- `ttpos desk map`、`ttpos desk layout`：桌台平面图的区域与每个区域的桌位布局。
+- `ttpos product batch-tags`：分批上菜类型。
+- `ttpos tax documents`：一张税票的留底图片、XML 是否可取（只看状态，不下载文件）。
+- `ttpos takeout scheduled-push`（菜单定时推送任务）、`ttpos takeout dine-out-mapping`（Dine Out 券对应的商品）、`ttpos takeout store-hour-log`（Grab 营业时间的修改与同步记录，不含发给 Grab 的原始内容）。
+- `ttpos member duplicates`：连锁里手机号重复的会员（仅连锁总部可查，结果打码）。
+
+### Changed
+
+- 表格里以 `Time`、`At` 结尾的时间字段也显示为日期时间。
+
 ## [0.11.0] - 2026-11-10
 
 ### Changed
@@ -243,7 +258,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.12.0
 [0.11.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.11.0
 [0.10.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.10.0
 [0.9.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.9.0

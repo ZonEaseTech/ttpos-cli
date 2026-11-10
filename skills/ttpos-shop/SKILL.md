@@ -1,6 +1,6 @@
 ---
 name: ttpos-shop
-description: Answers TTPOS shop-level questions through the ttpos CLI - which shops the account can access, setting the default shop, and which shops' licenses are about to expire or already expired (from the cloud platform). Also shows a shop's basic info (address, phone, tax number, store code, time zone). Use when asked 门店地址, 门店电话, 税号, 门店编号, 有哪些店, 能查哪些门店, 设默认门店, 门店到期, 快到期的店, 哪些店过期了, 授权还剩几天, 续费. Not for a shop's settings (ttpos-setting) or revenue (ttpos-stats).
+description: Answers TTPOS shop-level questions through the ttpos CLI - which shops the account can access, setting the default shop, and which shops' licenses are about to expire or already expired (from the cloud platform). Also shows a shop's basic info (address, phone, tax number, store code, time zone) and its bound call-board screens. Use when asked 门店地址, 门店电话, 税号, 门店编号, 有哪些店, 能查哪些门店, 设默认门店, 门店到期, 快到期的店, 哪些店过期了, 授权还剩几天, 续费, 叫号屏, 取餐屏. Not for a shop's settings (ttpos-setting) or revenue (ttpos-stats).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -22,6 +22,7 @@ metadata:
 | 哪些门店 30 天内到期或已过期 | `ttpos shop expiry` |
 | 60 天内到期的 | `ttpos shop expiry --within 60` |
 | 我负责的门店里哪些快到期 | `ttpos shop expiry --mine` |
+| 叫号屏、取餐屏绑定了哪些设备 | `ttpos shop devices` |
 
 ## 门店到期
 

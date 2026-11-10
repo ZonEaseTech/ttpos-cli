@@ -16,6 +16,8 @@ metadata:
 |---|---|
 | 有多少张桌、哪些桌有人 | `ttpos desk list --size 100` |
 | 有哪些区域、每个区域几张桌 | `ttpos desk region list` |
+| 平面图的区域、布局配了没有 | `ttpos desk map` |
+| 一个区域里每张桌的位置 | `ttpos desk layout <region_uuid>`（uuid 取自 `desk map`） |
 
 ```bash
 ttpos desk list --page 2 --size 100

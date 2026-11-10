@@ -26,6 +26,9 @@ metadata:
 | Grab Dine Out 券核销了多少 | `ttpos takeout dine-out --date this-week`（`--code` 按券码查） |
 | 推到外卖平台的菜单有哪些商品、价格、推送成功没有 | `ttpos takeout menu`（`--platform lineman`） |
 | 谁建、改、停了外卖促销活动 | `ttpos takeout campaign-log`，再 `ttpos takeout campaign <campaign_uuid>` 看活动详情 |
+| 菜单定时推送有没有执行、为什么失败 | `ttpos takeout scheduled-push`（`--platform lineman`） |
+| Dine Out 券对应哪些商品 | `ttpos takeout dine-out-mapping` |
+| Grab 营业时间改了没有、同步成功没有 | `ttpos takeout store-hour-log` |
 
 ## 读结果
 
@@ -36,4 +39,4 @@ metadata:
 
 ## 做不到的
 
-外卖促销活动列表、营业时间、外卖商品上下架目前不支持，如实告诉用户，并按 `ttpos-shared` 的规则询问是否反馈需求。
+外卖促销活动列表、当前营业时间设置、外卖商品上下架目前不支持，如实告诉用户，并按 `ttpos-shared` 的规则询问是否反馈需求。

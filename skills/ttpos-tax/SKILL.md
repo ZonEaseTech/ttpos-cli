@@ -18,6 +18,7 @@ metadata:
 | 某段时间的税票、作废的、红冲的 | `ttpos tax report --from 2026-10-01 --to 2026-10-31 --category voided`（或 simple、full、credit_note） |
 | 按税票号找 | `ttpos tax report --keyword <税票号>` |
 | 一个月的 PP.30 销项税汇总 | `ttpos tax pp30 --from 2026-10-01 --to 2026-10-31` |
+| 某张税票的图片、XML 能不能取 | `ttpos tax documents <invoice_uuid>`（uuid 取自 `tax report`；只看状态，不下载文件） |
 
 ## 读结果
 
