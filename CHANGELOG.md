@@ -17,6 +17,14 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-10
+
+### Added
+
+- `ttpos shop info`：门店基本信息（地址、电话、税号、门店编号、时区、营业状态）。
+- `ttpos notice`：当前账号的系统通知列表与未读数（只读，不会标为已读）。
+- `ttpos tax`：销售税票明细（`report`，含作废与红冲）与 PP.30 销项税汇总（`pp30`），时间按门店时区，默认今天。
+
 ## [0.7.0] - 2026-11-10
 
 ### Added
@@ -203,7 +211,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.8.0
 [0.7.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.7.0
 [0.6.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.6.0
 [0.5.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.1

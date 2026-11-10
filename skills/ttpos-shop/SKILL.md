@@ -1,6 +1,6 @@
 ---
 name: ttpos-shop
-description: Answers TTPOS shop-level questions through the ttpos CLI - which shops the account can access, setting the default shop, and which shops' licenses are about to expire or already expired (from the cloud platform). Use when asked 有哪些店, 能查哪些门店, 设默认门店, 门店到期, 快到期的店, 哪些店过期了, 授权还剩几天, 续费. Not for a shop's settings (ttpos-setting) or revenue (ttpos-stats).
+description: Answers TTPOS shop-level questions through the ttpos CLI - which shops the account can access, setting the default shop, and which shops' licenses are about to expire or already expired (from the cloud platform). Also shows a shop's basic info (address, phone, tax number, store code, time zone). Use when asked 门店地址, 门店电话, 税号, 门店编号, 有哪些店, 能查哪些门店, 设默认门店, 门店到期, 快到期的店, 哪些店过期了, 授权还剩几天, 续费. Not for a shop's settings (ttpos-setting) or revenue (ttpos-stats).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -11,6 +11,9 @@ metadata:
 先读 `ttpos-shared`（`--shop` 解析、默认商户和别名规则都在那里）。
 
 ## 能回答的问题
+
+门店地址、电话、税号、门店编号、时区：`ttpos shop info`（默认门店，`--shop` 指定其他门店）。
+
 
 | 问题 | 命令 |
 |---|---|

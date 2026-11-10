@@ -27,9 +27,11 @@
 | **营⁠销** | `ttpos marketing`<br>营销活动（邀请有礼、扫码领券等）与领券记录；优惠券的剩余、发放与核销；满减活动 |
 | **商⁠品** | `ttpos product`<br>价格、上下架、分类；单位、加料、属性、规格、税类 |
 | **配⁠方⁠成⁠本** | `ttpos bom`<br>菜品配方、BOM 配置、套餐与订单用料、成本卡 |
-| **门⁠店** | `ttpos shop`<br>账号能访问哪些门店、默认门店与别名；哪些门店授权快到期或已过期 |
+| **门⁠店** | `ttpos shop`<br>账号能访问哪些门店、默认门店与别名；门店地址、电话、税号、门店编号；哪些门店授权快到期或已过期 |
 | **桌⁠台** | `ttpos desk`<br>桌台是否开台、所在区域 |
 | **门⁠店⁠配⁠置** | `ttpos setting` `ttpos payment-method` `ttpos printer`<br>营业、收银副屏、支付开关、自助点餐机、厨显、打印联数；支付方式；打印模板 |
+| **税⁠票** | `ttpos tax`<br>销售税票明细（含作废、红冲）、PP.30 销项税汇总 |
+| **通⁠知** | `ttpos notice`<br>未读通知数、最近的系统通知与待审批提醒 |
 | **员⁠工** | `ttpos staff`<br>员工账号、角色、每个角色的权限；操作日志（谁在什么时候改了什么） |
 
 每个命令的 `--help` 开头都列着它能回答的问题，例如 `ttpos stats --help`。
@@ -42,7 +44,7 @@
 | 交班 | 交班报表 |
 | 库存 | 采购、物料、调拨、盘点 |
 | 连锁总部 | 商品上架计划、管控策略、总部下发记录 |
-| 其他 | 门店基本信息、系统通知、打印自定义配置 |
+| 其他 | 打印自定义配置 |
 
 排期以 [Releases](https://github.com/ZonEaseTech/ttpos-cli/releases) 为准。
 
@@ -134,7 +136,9 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | `ttpos-marketing` | 营销活动、优惠券、满减 |
 | `ttpos-product` | 商品及单位、加料、属性、规格、税类 |
 | `ttpos-bom` | 配方、BOM、成本卡 |
-| `ttpos-shop` | 可访问门店、默认门店、授权到期 |
+| `ttpos-shop` | 可访问门店、默认门店、门店信息、授权到期 |
+| `ttpos-notice` | 系统通知与审批提醒 |
+| `ttpos-tax` | 税票与 PP.30 |
 | `ttpos-desk` | 桌台与区域 |
 | `ttpos-setting` | 门店配置 |
 | `ttpos-payment-method` | 支付方式 |

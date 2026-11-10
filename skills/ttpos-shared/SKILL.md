@@ -23,7 +23,9 @@ metadata:
 | 营销活动、优惠券、满减 | `ttpos-marketing` |
 | 商品、分类、价格 | `ttpos-product` |
 | 配方、成本卡 | `ttpos-bom` |
-| 能查哪些店、门店到期 | `ttpos-shop` |
+| 能查哪些店、门店到期、门店基本信息 | `ttpos-shop` |
+| 系统通知、待审批提醒 | `ttpos-notice` |
+| 税票、PP.30 销项税 | `ttpos-tax` |
 | 桌台、门店配置、支付方式、打印模板 | `ttpos-desk`、`ttpos-setting`、`ttpos-payment-method`、`ttpos-printer` |
 | 员工、角色、权限、谁改了什么（操作日志） | `ttpos-staff` |
 | 环境出问题 | `ttpos-doctor` |
