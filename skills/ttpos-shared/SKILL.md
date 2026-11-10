@@ -19,7 +19,8 @@ metadata:
 | 会员外送单 | `ttpos-member-order` |
 | Grab、LINE MAN 外卖订单、外卖平台接入状态 | `ttpos-takeout` |
 | 会员充值单、可退金额 | `ttpos-recharge` |
-| 会员余额、积分、等级、消费记录 | `ttpos-member` |
+| 会员余额、积分、等级、消费记录、会员卡、充值和消费排行 | `ttpos-member` |
+| 营销活动、优惠券、满减 | `ttpos-marketing` |
 | 商品、分类、价格 | `ttpos-product` |
 | 配方、成本卡 | `ttpos-bom` |
 | 能查哪些店、门店到期 | `ttpos-shop` |

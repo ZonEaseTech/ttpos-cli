@@ -20,6 +20,17 @@ metadata:
 | 会员的充值记录 | `ttpos member flow <member_uuid> --type 2` |
 | 有哪些会员等级 | `ttpos member levels` |
 
+## 全体会员的统计与流水
+
+| 问题 | 命令 |
+|---|---|
+| 所有会员一共还有多少储值余额 | `ttpos member overview` |
+| 充值最多、消费最多的会员 | `ttpos member recharge-rank`、`ttpos member consume-rank --by 2` |
+| 一段时间内谁的积分、余额有变动 | `ttpos member points` / `ttpos member balances --from ... --to ...`（`--keyword` 指定会员，`--scene` 指定场景） |
+| 有哪些会员卡、谁持有、什么时候到期 | `ttpos member card-types`、`ttpos member cards --status 1` |
+
+这些是列表，手机号和昵称打码；要看某个会员的完整信息，用 `member get <member_uuid>`。门店没开启会员功能或账号没有对应权限时会报错，如实转告。
+
 ## 要点
 
 - `--keyword` 是模糊匹配，可能命中多个会员；多个时列出候选，让用户确认是哪一位，不要替他选。

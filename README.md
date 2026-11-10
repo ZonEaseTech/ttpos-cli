@@ -23,7 +23,8 @@
 | **外⁠送⁠订⁠单** | `ttpos member-order`<br>会员在线下单的外送订单：配送状态与详情 |
 | **外⁠卖** | `ttpos takeout`<br>Grab、LINE MAN 的外卖订单（已结束和进行中）、订单详情；平台是否开启和绑定、菜单最近一次推送 |
 | **会⁠员⁠充⁠值** | `ttpos recharge`<br>充值记录、充值详情、还能退多少 |
-| **会⁠员** | `ttpos member`<br>按手机号、会员号、昵称找会员；余额、积分、等级；消费、充值、积分流水 |
+| **会⁠员** | `ttpos member`<br>按手机号、会员号、昵称找会员；余额、积分、等级；消费、充值、积分流水；全体会员的余额合计、充值和消费排行、积分与余额变动、会员卡 |
+| **营⁠销** | `ttpos marketing`<br>营销活动（邀请有礼、扫码领券等）与领券记录；优惠券的剩余、发放与核销；满减活动 |
 | **商⁠品** | `ttpos product`<br>价格、上下架、分类；单位、加料、属性、规格、税类 |
 | **配⁠方⁠成⁠本** | `ttpos bom`<br>菜品配方、BOM 配置、套餐与订单用料、成本卡 |
 | **门⁠店** | `ttpos shop`<br>账号能访问哪些门店、默认门店与别名；哪些门店授权快到期或已过期 |
@@ -129,7 +130,8 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | `ttpos-member-order` | 会员外送单 |
 | `ttpos-takeout` | Grab、LINE MAN 外卖订单与平台状态 |
 | `ttpos-recharge` | 会员充值与可退金额 |
-| `ttpos-member` | 会员、余额积分、流水、等级 |
+| `ttpos-member` | 会员、余额积分、流水、等级、会员卡、排行 |
+| `ttpos-marketing` | 营销活动、优惠券、满减 |
 | `ttpos-product` | 商品及单位、加料、属性、规格、税类 |
 | `ttpos-bom` | 配方、BOM、成本卡 |
 | `ttpos-shop` | 可访问门店、默认门店、授权到期 |

@@ -17,6 +17,17 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-10
+
+### Added
+
+- `ttpos member` 新增全体会员的统计与流水：`overview`（储值余额合计）、`recharge-rank`、`consume-rank`、`points`、`balances`（积分与余额变动）、`card-types`、`cards`（会员卡与持卡记录）。
+- `ttpos marketing`：营销活动与领券记录（`activities`、`claims`）、优惠券与发放核销记录（`coupons`、`coupon-records`）、满减活动（`full-reductions`）。
+
+### Changed
+
+- 使用统计在命令不存在时记下尝试的命令名（只记像命令名的单词，不记参数），用来发现大家以为有、实际没有的命令。
+
 ## [0.6.0] - 2026-11-10
 
 ### Added
@@ -192,7 +203,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.7.0
 [0.6.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.6.0
 [0.5.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.1
 [0.5.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.0
