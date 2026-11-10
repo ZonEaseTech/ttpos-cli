@@ -10,6 +10,12 @@ metadata:
 
 先读 `ttpos-shared`。本版只有模板列表，不提供模板详情、预览图和打印机配置，被问到直接说没有。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 有哪些打印模板 | `ttpos printer template list` |
+
 ```bash
 ttpos printer template list
 ```

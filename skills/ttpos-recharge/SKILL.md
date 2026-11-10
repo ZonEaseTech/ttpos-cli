@@ -10,6 +10,14 @@ metadata:
 
 先读 `ttpos-shared`。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 最近的充值记录 | `ttpos recharge list` |
+| 一笔充值的详情 | `ttpos recharge get <uuid>` |
+| 这笔充值还能退多少 | `ttpos recharge refund-info <uuid>` |
+
 ## `ttpos recharge list`
 
 ```bash
@@ -22,7 +30,7 @@ ttpos recharge list --order-no <订单号> --from YYYY-MM-DD --to YYYY-MM-DD
 - 不传日期默认最近 7 天。`--order-no` 不会放宽时间范围，更早的订单要同时传日期；"没查到"先看 `notice`。
 - 只传 `--from` 时 `--to` 补到现在，日期太早会超 31 天；只传 `--to` 时 `--from` 补为往前 7 天。
 - **日期按创建时间过滤**，不能按支付时间过滤。输出的 `payment_time` 可能与创建时间差好几天，查不到预期单据就放宽 `--from`。
-- `status` 是原始整数状态码，没有文字映射，不要猜含义。
+- `status` 取 0 待付款、1 已完成、2 已取消；`status_text` 是中文含义，直接用。
 - 每项取 `uuid`（字符串）给 `get` 和 `refund-info` 用；金额看 `recharge_amount`、`gift_amount`；`payment_methods` 是字符串数组。
 
 ## `ttpos recharge get <uuid>`

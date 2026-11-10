@@ -10,6 +10,13 @@ metadata:
 
 先读 `ttpos-shared`。本版不提供 LianLianPay 支付配置查询，被问到直接说没有。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 这家店开了哪些支付方式、是否启用 | `ttpos payment-method list` |
+| 还能添加哪些系统支付方式 | `ttpos payment-method default` |
+
 ```bash
 ttpos payment-method list --page 2 --size 100
 ttpos payment-method get <uuid>

@@ -10,6 +10,14 @@ metadata:
 
 先读 `ttpos-shared`。本版不提供 `member-order return-info`，被问到可退信息直接说没有。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 今天的外送订单 | `ttpos member-order list` |
+| 配送中的外送单 | `ttpos member-order list --status delivery` |
+| 一笔外送单的详情 | `ttpos member-order get <uuid>` |
+
 ## `ttpos member-order list`
 
 ```bash

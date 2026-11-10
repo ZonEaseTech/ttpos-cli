@@ -9,6 +9,21 @@ TTPOS 的命令行工具：在终端里查商户的订单、商品、员工、�
 [Releases](https://github.com/ZonEaseTech/ttpos-cli/releases) 里的二进制，
 不含源码。
 
+## 让 AI 帮你装（推荐）
+
+把下面这段话原样发给你的 AI 助手（Claude Code、Codex、Cursor 等）：
+
+```text
+请帮我安装 TTPOS 命令行工具并登录：
+1. 运行 npm install -g @ttpos/cli && npx skills add ZonEaseTech/ttpos-cli -g -y
+2. 运行 ttpos --version 确认安装成功
+3. 把 ttpos auth login 放到后台运行，把它打印的授权链接和核对码发给我；我在浏览器里登录后，等命令自己退出
+4. 运行 ttpos shop list，列出我能查看的商户
+之后我问商户数据时，先读 ttpos-shared 技能再查。
+```
+
+登录必须你本人在浏览器里完成，AI 不会也不应该替你输入密码。
+
 ## 安装
 
 ### 方式一：npm（需 Node ≥18）
@@ -64,23 +79,26 @@ ttpos order list          # 开始查
 浏览器没弹出时手动打开终端里的链接；不想自动打开加 `--no-browser`。
 查询走进程内，不用另开窗口、也不用常驻服务。卡住时跑 `ttpos doctor`。
 
-## 命令
+## 按业务域查
 
-| 命令 | 查什么 |
+| 业务域 | 能回答的问题（举例） |
 | --- | --- |
-| `ttpos order` | 订单列表与详情 |
-| `ttpos product` | 商品、分类、单位 / 加料 / 属性 / 规格 / 税类 |
-| `ttpos desk` | 桌台与区域 |
-| `ttpos staff` | 员工、角色、权限树 |
-| `ttpos member-order` | 会员订单 |
-| `ttpos recharge` | 会员充值订单 |
-| `ttpos setting` | 营业 / 收银 / 支付 / 自助机 / 厨显 / 打印配置 |
-| `ttpos bom` | 配方、物料清单、成本卡 |
-| `ttpos payment-method` | 支付方式、系统默认支付方式清单 |
-| `ttpos printer` | 打印模板 |
-| `ttpos shop` | 商户列表与默认商户 |
-| `ttpos doctor` | 环境自查 |
-| `ttpos skills` | 内置的 agent 使用说明（与当前版本一致） |
+| `ttpos stats` 经营 | 今天、本月营业额，实收、单数、客单价；各门店对比；热销菜；支付方式收入；员工提成 |
+| `ttpos order` 订单 | 某段时间的订单、按订单号查、取消单、某单明细与退款 |
+| `ttpos member-order` / `ttpos recharge` | 会员外送单；充值单与可退金额 |
+| `ttpos member` 会员 | 按手机号或会员号找会员；余额、积分、等级；消费与充值记录 |
+| `ttpos product` / `ttpos bom` 商品 | 价格、上下架、分类；配方与成本卡 |
+| `ttpos shop` 门店 | 能查哪些店；哪些店快到期（需云平台账号） |
+| `ttpos desk` / `setting` / `payment-method` / `printer` | 桌台占用、门店配置、支付方式、打印模板 |
+| `ttpos staff` 员工 | 员工、角色、权限 |
+
+每个业务域的 `--help` 开头列着它能回答的问题和对应命令，例如 `ttpos stats --help`。
+状态码都显示成文字（如"已完成""空闲"），商品显示分类名。
+
+统计必须带时间范围：默认今天，可用 `--date yesterday|this-week|this-month|...` 或
+`--from/--to`（最长 31 天），按门店营业日计算。
+
+门店到期时间只有云平台能查，需要云平台账号：`ttpos auth login --cloud`（登录有效 10 小时）。
 
 ## 帮助
 
@@ -130,10 +148,10 @@ CLI 只发查询请求，但 TTPOS 服务端在"进入某个商户"这一步会�
 输出默认做了脱敏，方便直接交给 agent：
 
 - 密码、私钥、token 类字段始终显示为 `"***"`。
-- 手机号、邮箱、税号/证件号、银行账号、详细地址默认打码（如
-  `******5678`、`a***@example.com`）。
-- 需要看完整联系方式时加全局 `--reveal`；密码类字段仍然遮蔽。
-  `--reveal` 只能由人在终端运行，并输入屏幕上显示的确认码；agent 调用会被拒绝。
+- 列表和搜索结果里，手机号、邮箱、证件号、银行账号、会员昵称、详细地址打码（如
+  `******5678`、`a***@example.com`），防止批量拉取名单。
+- 按 uuid 查单条（如 `member get`、`staff get`、`order get`）时完整显示联系方式。
+- 列表里也要看完整值时加全局 `--reveal`：只能由人在终端运行，并输入屏幕上显示的确认码；agent 调用会被拒绝。
 - 字符串中的终端控制字符会被去掉。
 
 ## Agent skills

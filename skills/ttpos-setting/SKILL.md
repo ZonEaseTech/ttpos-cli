@@ -10,6 +10,13 @@ metadata:
 
 先读 `ttpos-shared`。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 营业设置（营业时间、抹零等） | `ttpos setting get business` |
+| 收银、支付、自助机、厨显、打印设置 | `ttpos setting get <类型>` |
+
 ```bash
 ttpos setting get business
 ttpos setting get kiosk | jq '.data.call_waiter_enabled'

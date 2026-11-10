@@ -1,6 +1,6 @@
 ---
 name: ttpos-staff
-description: Looks up TTPOS staff accounts, roles and the permission tree through the ttpos CLI, with contact details masked by default. Use when asked 有哪些员工, 谁是超管, 员工详情, 员工联系方式, 员工手机号, 有哪些角色, 这个角色有哪些权限, 权限树. Not for orders, products, desks or member data.
+description: Looks up TTPOS staff accounts, roles and the permission tree through the ttpos CLI, with contact details masked in lists and shown in full for a single staff member. Use when asked 有哪些员工, 谁是超管, 员工详情, 员工联系方式, 员工手机号, 有哪些角色, 这个角色有哪些权限, 权限树. Not for orders, products, desks or member data.
 metadata:
   requires:
     bins: ["ttpos"]
@@ -10,11 +10,17 @@ metadata:
 
 先读 `ttpos-shared`。本版不提供 `staff search`（按邮箱或手机号跨商户查人）；只能在当前商户内用 `staff list --keyword` 查。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 有哪些员工、什么角色 | `ttpos staff list` |
+| 某个员工的完整联系方式 | `ttpos staff get <uuid>` |
+| 某个角色有哪些权限 | `ttpos staff role get <uuid>` |
+
 ## 联系方式
 
-手机号、邮箱默认打码。**`--reveal` 对 agent 不可用**，调用会被拒（退出码 2，`REVEAL_REQUIRES_TERMINAL`），人明确要求时也一样。
-
-被问联系方式时：不要尝试 `--reveal`，先给打码结果；用户要完整号码时告诉他：完整号码请你自己在终端运行 `ttpos staff get <uuid> --reveal`。
+`staff list` 的手机号、邮箱打码；`staff get <uuid>` 按 uuid 查单条，完整显示。被问某个员工的联系方式时，先用 `staff list --keyword` 找到 uuid，再 `staff get`。不要用 `--reveal`（agent 调用会被拒）。
 
 ## 命令
 

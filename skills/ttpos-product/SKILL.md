@@ -10,6 +10,14 @@ metadata:
 
 先读 `ttpos-shared`。查询上限：有分页的列表每页最多 100 条。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 某个商品多少钱、上没上架、在哪个分类 | `ttpos product list --keyword <名称>` |
+| 有哪些分类 | `ttpos product category list` |
+| 商品的规格、加料、税类 | `ttpos product get <uuid>` |
+
 ## 命令
 
 ```bash

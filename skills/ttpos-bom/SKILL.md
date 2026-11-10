@@ -10,6 +10,14 @@ metadata:
 
 先读 `ttpos-shared`。本版不提供 BOM 导出和导入模板下载，被问到直接说没有。
 
+## 能回答的问题
+
+| 问题 | 命令 |
+|---|---|
+| 某道菜的配方 | `ttpos bom module list --keyword <名称>` |
+| 哪些商品配了 BOM | `ttpos bom product list` |
+| 一张成本卡 | `ttpos bom card get <uuid>` |
+
 ## 选哪条命令
 
 | 想查 | 命令 |

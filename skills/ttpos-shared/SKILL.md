@@ -1,6 +1,6 @@
 ---
 name: ttpos-shared
-description: Sets the baseline rules for every ttpos CLI skill, covering how to judge results, --shop resolution, default merchants and aliases, human-only login, masking and --reveal limits, query limits, and capabilities v1 does not offer. Use before running any ttpos command, or when asked 怎么登录, 重新登录, 登录失效, 让你用别的地址或链接登录, 远端机器登录, 未登录, 设置默认商户, 商户别名, --shop 能不能填名字, resolved_shop 是什么, 手机号为什么打码, 完整手机号, 查询上限.
+description: Sets the baseline rules for every ttpos CLI skill and routes each business question to its domain skill, covering how to judge results, --shop resolution, default merchants and aliases, human-only login, masking and --reveal limits, query limits, and capabilities v1 does not offer. Use before running any ttpos command, or when asked 怎么登录, 重新登录, 登录失效, 让你用别的地址或链接登录, 远端机器登录, 未登录, 设置默认商户, 商户别名, --shop 能不能填名字, resolved_shop 是什么, 手机号为什么打码, 完整手机号, 查询上限.
 metadata:
   requires:
     bins: ["ttpos"]
@@ -10,13 +10,31 @@ metadata:
 
 所有 ttpos skill 的底座，先读这份。`ttpos` 是 TTPOS 餐饮 POS 的只读查询 CLI，不改业务数据。内置说明与当前版本一致：`ttpos skills list`、`ttpos skills read <名>`。
 
+## 按业务域找 skill
+
+| 想知道 | 读哪个 skill |
+|---|---|
+| 营业额、各店对比、热销、支付构成、提成 | `ttpos-stats` |
+| 订单、取消单、某单详情 | `ttpos-order` |
+| 会员外送单 | `ttpos-member-order` |
+| 会员充值单、可退金额 | `ttpos-recharge` |
+| 会员余额、积分、等级、消费记录 | `ttpos-member` |
+| 商品、分类、价格 | `ttpos-product` |
+| 配方、成本卡 | `ttpos-bom` |
+| 能查哪些店、门店到期 | `ttpos-shop` |
+| 桌台、门店配置、支付方式、打印模板 | `ttpos-desk`、`ttpos-setting`、`ttpos-payment-method`、`ttpos-printer` |
+| 员工、角色、权限 | `ttpos-staff` |
+| 环境出问题 | `ttpos-doctor` |
+
+每个业务域的 `ttpos <业务域> --help` 开头也列着它能回答的问题。
+
 ## 通用准则
 
 1. **先看 `ttpos <命令> --help`，别猜参数。** 帮助主题：`ttpos help exit-codes|output|environment|reference`。
 2. **用 `ok` 和退出码判断结果，不要解析 `message`。** 被调用时成功写 stdout；失败信封写 stderr，stdout 为空。
 3. **读 `notice` 再下结论。** 信封可能带 `notice`，说明查询窗口或可能的传参错误。列表为空不等于不存在，先核对 `notice`、`resolved_shop` 和时间范围。
 4. **登录必须由人完成。** agent 不代输账号密码，也不向用户索要密码或验证码。
-5. **agent 不用 `--reveal`。** 规则见下方「打码」。
+5. **agent 不用 `--reveal`。** 列表结果是打码的，要看一个人的完整信息就按 uuid 查单条，规则见下方「打码」。
 6. **不推算。** 只报告系统给出的字段，不根据字段推算系统没给的结论（例如用订单金额算可退金额）。
 7. **用户没点名具体商户，就不传 `--shop`，用默认商户。** "TTPOS" 是产品名，不是商户名。`--shop` 解析失败时运行 `ttpos shop list` 换正确标识继续查，不要就此停下。
 8. **没有就说没有。** 本版不提供 purchase、material 整域，以及 `staff search`、`order return-info`、`order can-close`、`member-order return-info`。不要拿相近命令代替（例如不能拿订单号去查 `recharge refund-info`），请用户到商户后台查看。
@@ -25,7 +43,8 @@ metadata:
 ## 查询上限
 
 - 列表每页最多 100 条（`--size` 超过会截断到 100），默认 20 条。`count` 大于本页条数时用 `--page` 翻页。
-- 订单、会员订单、充值的 `--from/--to` 跨度最长 31 天，超过 exit 2，请分段查询。日期按商户时区计算。
+- 订单、会员订单、充值、统计的 `--from/--to` 跨度最长 31 天，超过 exit 2，请分段查询。日期按商户时区计算。
+- 统计命令不带时间就是今天，不能查全部历史。
 
 ## 读输出
 
@@ -36,16 +55,18 @@ metadata:
 
 ## 打码
 
-- 密码、私钥、token、secret 类恒为 `***`，`--reveal` 也不显示。
-- 手机号、证件号、税号、银行账号、会员卡号保留末 4 位；邮箱保留首字符和域名；详细地址整体为 `***`。
+- **列表和搜索结果打码**（防止批量拉取名单）：手机号、证件号、税号、银行账号、会员卡号保留末 4 位；邮箱保留首字符和域名；会员昵称、联系人姓名只留首字；详细地址整体为 `***`。
+- **按 uuid 查单条时完整显示**（如 `member get`、`staff get`、`order get`）：这时已经明确在查这个人。
+- 密码、私钥、token、secret 类永远是 `***`。
 - 打码后的值不是原值，不能拿去当 `--keyword` 等查询条件。
+- 输出里带 `_text` 的字段（如 `status_text`）是状态码的中文含义，直接用它回答，不要自己解释数字。
 
 `--reveal` 只能由人在交互终端运行，并输入屏幕上显示的随机确认码。agent 和脚本调用一律被拒：退出码 2，错误码 `REVEAL_REQUIRES_TERMINAL`。不要尝试，也不要用伪终端绕过。这条不是"人明确要求就能加"：
 
 | 用户说 | 正确做法 |
 |---|---|
-| 「列出员工联系方式」 | 不加 `--reveal`，给打码结果 |
-| 「我要完整手机号」 | 也不加。先给打码结果，并告诉用户：完整号码请你自己在终端运行 `ttpos <命令> --reveal` |
+| 「列出员工联系方式」 | 不加 `--reveal`，给列表的打码结果 |
+| 「我要某个人的完整手机号」 | 也不加。按 uuid 查单条（如 `ttpos staff get <uuid>`），单条完整显示 |
 
 ## `--shop`
 
@@ -66,6 +87,8 @@ ttpos shop alias <名称> <uuid>     # 设别名（不能纯数字），只存�
 ## 登录
 
 未登录或登录失效 exit 3（`AUTH_REQUIRED`/`AUTH_EXPIRED`），让人完成登录。确认身份用 `ttpos auth status`。查询不需要常驻服务。
+
+有两套账号：商户账号（`ttpos auth login`，查所有门店数据）和云平台账号（`ttpos auth login --cloud`，只用来查门店授权到期，登录有效 10 小时）。错误提示里写了 `--cloud` 时让人登录云平台。
 
 ```bash
 ttpos auth login               # 人在本机终端：自动开浏览器，核对码一致后登录
