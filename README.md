@@ -1,6 +1,6 @@
 # TTPOS CLI
 
-[![npm](https://img.shields.io/npm/v/@ttpos/cli?label=npm&color=FFBE00)](https://www.npmjs.com/package/@ttpos/cli) [![release](https://img.shields.io/github/v/release/ZonEaseTech/ttpos-cli?color=FFBE00)](https://github.com/ZonEaseTech/ttpos-cli/releases)
+[![npm](https://img.shields.io/npm/v/@ttpos/cli?label=npm&color=FFBE00)](https://www.npmjs.com/package/@ttpos/cli)
 
 在终端里查询 TTPOS 门店的经营数据：今天卖了多少、某张订单怎么回事、会员还剩多少余额、哪些门店快到期。
 你可以自己输入命令查，也可以交给 Claude Code、Codex、Cursor 等 AI 助手代查。
@@ -16,19 +16,19 @@
 
 ## 能查什么
 
-| 业务域 | 能查到的内容 | 命令 |
-| --- | --- | --- |
-| 经营 | 总销售额、实收金额、营业收入、订单数、客单价、退款与取消单；名下各门店对比；热销菜品；各支付方式收入；员工业绩与提成 | `ttpos stats` |
-| 订单 | 按日期、订单号、状态查门店订单；订单明细、付款与退款记录 | `ttpos order` |
-| 会员外送单 | 会员在线下单的外送订单：配送状态与详情 | `ttpos member-order` |
-| 会员充值 | 充值记录、充值详情、还能退多少 | `ttpos recharge` |
-| 会员 | 按手机号、会员号、昵称找会员；余额、积分、等级；消费、充值、积分流水 | `ttpos member` |
-| 商品 | 价格、上下架、分类；单位、加料、属性、规格、税类 | `ttpos product` |
-| 配方与成本 | 菜品配方、BOM 配置、套餐与订单用料、成本卡 | `ttpos bom` |
-| 门店 | 账号能访问哪些门店、默认门店与别名；哪些门店授权快到期或已过期 | `ttpos shop` |
-| 桌台 | 桌台是否开台、所在区域 | `ttpos desk` |
-| 门店配置 | 营业、收银副屏、支付开关、自助点餐机、厨显、打印联数；支付方式；打印模板 | `ttpos setting`<br>`ttpos payment-method`<br>`ttpos printer` |
-| 员工 | 员工账号、角色、每个角色的权限 | `ttpos staff` |
+| 业务域 | 命令与能查到的内容 |
+| --- | --- |
+| **经营** | `ttpos stats`<br>总销售额、实收金额、营业收入、订单数、客单价、退款与取消单；名下各门店对比；热销菜品；各支付方式收入；员工业绩与提成 |
+| **订单** | `ttpos order`<br>按日期、订单号、状态查门店订单；订单明细、付款与退款记录 |
+| **外送订单** | `ttpos member-order`<br>会员在线下单的外送订单：配送状态与详情 |
+| **会员充值** | `ttpos recharge`<br>充值记录、充值详情、还能退多少 |
+| **会员** | `ttpos member`<br>按手机号、会员号、昵称找会员；余额、积分、等级；消费、充值、积分流水 |
+| **商品** | `ttpos product`<br>价格、上下架、分类；单位、加料、属性、规格、税类 |
+| **配方成本** | `ttpos bom`<br>菜品配方、BOM 配置、套餐与订单用料、成本卡 |
+| **门店** | `ttpos shop`<br>账号能访问哪些门店、默认门店与别名；哪些门店授权快到期或已过期 |
+| **桌台** | `ttpos desk`<br>桌台是否开台、所在区域 |
+| **门店配置** | `ttpos setting` `ttpos payment-method` `ttpos printer`<br>营业、收银副屏、支付开关、自助点餐机、厨显、打印联数；支付方式；打印模板 |
+| **员工** | `ttpos staff`<br>员工账号、角色、每个角色的权限 |
 
 每个命令的 `--help` 开头都列着它能回答的问题，例如 `ttpos stats --help`。
 
