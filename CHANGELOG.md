@@ -17,6 +17,14 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-10
+
+### Added
+
+- `ttpos cloud shop list`：用云平台账号按名称或 ID 搜全部商户，显示状态、到期日、时区和设备限额（收银机、厨房、平板、桌台）。
+- `ttpos cloud shop get`：一个商户的详情，包括语言、各类设备上限、短信余额、联系电话、超管账号、总部，以及已开通和未开通的功能。
+- 两个账号同时登录时，云平台的搜索结果和详情会标出当前商户账号能否继续查这个商户（`merchant_access`），能查的直接用 `--shop <company_uuid>` 查订单等数据。
+
 ## [0.12.0] - 2026-11-10
 
 ### Added
@@ -258,7 +266,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.13.0
 [0.12.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.12.0
 [0.11.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.11.0
 [0.10.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.10.0

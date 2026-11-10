@@ -23,7 +23,7 @@ metadata:
 | 营销活动、优惠券、满减 | `ttpos-marketing` |
 | 商品、分类、价格 | `ttpos-product` |
 | 配方、成本卡 | `ttpos-bom` |
-| 能查哪些店、门店到期、门店基本信息、叫号屏设备 | `ttpos-shop` |
+| 能查哪些店、门店到期、门店基本信息、叫号屏设备、在云平台搜商户（状态、时区、设备限额） | `ttpos-shop` |
 | 系统通知、待审批提醒 | `ttpos-notice` |
 | 税票、PP.30 销项税 | `ttpos-tax` |
 | 桌台、门店配置、支付方式、打印模板 | `ttpos-desk`、`ttpos-setting`、`ttpos-payment-method`、`ttpos-printer` |
@@ -96,9 +96,10 @@ ttpos shop alias <名称> <uuid>     # 设别名（不能纯数字），只存�
 | 账号 | 登录命令 | 用于 | 有效期 |
 |---|---|---|---|
 | 商户账号 | `ttpos auth login` | 门店到期以外的所有命令 | 30 天 |
-| 云平台账号 | `ttpos auth login --cloud` | 只有 `ttpos shop expiry`（加 `--mine` 时两个都要） | 10 小时，不能续期，过期重新登录 |
+| 云平台账号 | `ttpos auth login --cloud` | `ttpos cloud shop list/get`（全部商户的搜索、状态、限额）和 `ttpos shop expiry` | 10 小时，不能续期，过期重新登录 |
 
-- 用户只问门店到期，直接运行 `ttpos shop expiry`。不要先跑 `auth status`、`doctor`、`shop list`，也不要让他登录商户账号。
+- 用户只问门店到期或在云平台找商户，直接运行 `ttpos shop expiry` 或 `ttpos cloud shop list`。不要先跑 `auth status`、`doctor`、`shop list`，也不要让他登录商户账号。
+- 两个账号可以同时登录，互不影响。常见用法：先 `ttpos cloud shop list --keyword <名称>` 找到商户的 `company_uuid`，再用商户账号 `ttpos order list --shop <company_uuid>` 查订单。商户账号也登录时，搜索结果带 `merchant_access`：`true` 才能继续用 `--shop` 查；`false` 说明当前商户账号没有这家店的权限，CLI 不能绕过，如实告诉用户。
 - exit 3（`AUTH_REQUIRED`/`AUTH_EXPIRED`）时，按错误里的 `hint` 让人登录**那一个**账号，不要换成另一个账号的登录命令，也不要两个都要求。
 - `ttpos auth status` 同时显示两个账号，有一个有效就 exit 0：`data.username` 是商户账号，`data.cloud_username` 是云平台账号，只看你要用的那个。
 - 查询不需要常驻服务。

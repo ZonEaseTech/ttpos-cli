@@ -1,6 +1,6 @@
 ---
 name: ttpos-shop
-description: Answers TTPOS shop-level questions through the ttpos CLI - which shops the account can access, setting the default shop, and which shops' licenses are about to expire or already expired (from the cloud platform). Also shows a shop's basic info (address, phone, tax number, store code, time zone) and its bound call-board screens. Use when asked 门店地址, 门店电话, 税号, 门店编号, 有哪些店, 能查哪些门店, 设默认门店, 门店到期, 快到期的店, 哪些店过期了, 授权还剩几天, 续费, 叫号屏, 取餐屏. Not for a shop's settings (ttpos-setting) or revenue (ttpos-stats).
+description: Answers TTPOS shop-level questions through the ttpos CLI - which shops the account can access, setting the default shop, and which shops' licenses are about to expire or already expired (from the cloud platform). Also shows a shop's basic info (address, phone, tax number, store code, time zone) and its bound call-board screens. With a cloud-platform account, searches all merchants by name or ID and shows status, time zone, languages, device limits and enabled features. Use when asked 门店地址, 门店电话, 税号, 门店编号, 有哪些店, 能查哪些门店, 设默认门店, 门店到期, 快到期的店, 哪些店过期了, 授权还剩几天, 续费, 叫号屏, 取餐屏, 云平台搜商户, 商户状态, 设备限额, 收银机上限, 商户时区, 开通了哪些功能. Not for a shop's settings (ttpos-setting) or revenue (ttpos-stats).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -23,6 +23,9 @@ metadata:
 | 60 天内到期的 | `ttpos shop expiry --within 60` |
 | 我负责的门店里哪些快到期 | `ttpos shop expiry --mine` |
 | 叫号屏、取餐屏绑定了哪些设备 | `ttpos shop devices` |
+| 在云平台按名称或 ID 找商户 | `ttpos cloud shop list --keyword <名称或 ID>`（`--status 2` 只看禁用的） |
+| 某个商户的状态、时区、语言、设备限额、开了哪些功能 | `ttpos cloud shop get <company_uuid>` |
+| 找到商户后查它的订单 | 先看 `merchant_access`，为 `true` 时 `ttpos order list --shop <company_uuid>` |
 
 ## 门店到期
 

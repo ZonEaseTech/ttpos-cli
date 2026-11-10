@@ -28,6 +28,7 @@
 | **商⁠品** | `ttpos product`<br>价格、上下架、分类；单位、加料、属性、规格、税类；商品标签、时段菜单及修改记录、分批上菜类型 |
 | **配⁠方⁠成⁠本** | `ttpos bom`<br>菜品配方、BOM 配置、套餐与订单用料、成本卡；配方修改记录 |
 | **门⁠店** | `ttpos shop`<br>账号能访问哪些门店、默认门店与别名；门店地址、电话、税号、门店编号；哪些门店授权快到期或已过期；叫号屏、取餐屏设备 |
+| **云⁠平⁠台** | `ttpos cloud`<br>按名称或 ID 搜全部商户；状态、到期、时区、语言、设备限额、已开通的功能（需要云平台账号） |
 | **桌⁠台** | `ttpos desk`<br>桌台是否开台、所在区域；桌台平面图 |
 | **门⁠店⁠配⁠置** | `ttpos setting` `ttpos payment-method` `ttpos printer`<br>营业、收银副屏、支付开关、自助点餐机、厨显、打印联数、扫码点餐与配送、免单和退菜原因、备注预设、总部同步任务；支付方式与手续费；打印模板 |
 | **税⁠票** | `ttpos tax`<br>销售税票明细（含作废、红冲）、PP.30 销项税汇总；税票留底文件是否可取 |
@@ -73,9 +74,9 @@
 2. 运行 ttpos --version 确认安装成功
 3. 问我用哪种账号登录，再把对应命令放到后台运行，把它打印的授权链接和核对码发给我；我在浏览器里登录后，等命令自己退出：
    - 商户账号（查营业、订单、会员等门店数据）：ttpos auth login
-   - 云平台账号（只查门店授权到期）：ttpos auth login --cloud
-4. 商户账号登录后运行 ttpos shop list；云平台账号登录后运行 ttpos shop expiry
-之后我问 TTPOS 的数据时，先读 ttpos-shared 技能再查；只有用到另一种账号的命令时，才让我登录那个账号。
+   - 云平台账号（查全部商户的状态、到期、设备限额）：ttpos auth login --cloud
+4. 商户账号登录后运行 ttpos shop list；云平台账号登录后运行 ttpos cloud shop list
+之后我问 TTPOS 的数据时，先读 ttpos-shared 技能再查；两种账号可以都登录，只有用到另一种账号的命令时，才让我登录那个账号。
 ```
 
 登录必须由你本人在浏览器里完成，AI 助手不会、也不应该替你输入密码。
@@ -107,9 +108,9 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | 账号 | 登录 | 能查 | 有效期 |
 | --- | --- | --- | --- |
 | 商户账号 | `ttpos auth login` | 门店到期以外的全部内容 | 30 天 |
-| 云平台账号 | `ttpos auth login --cloud` | 门店授权到期（`ttpos shop expiry`） | 10 小时 |
+| 云平台账号 | `ttpos auth login --cloud` | 全部商户的搜索、状态、到期、时区、设备限额（`ttpos cloud shop`、`ttpos shop expiry`） | 10 小时 |
 
-`ttpos auth status` 同时显示两个账号的登录状态。
+两个账号可以同时登录：先在云平台找到商户的 uuid，再用商户账号 `--shop <uuid>` 查订单；搜索结果会标出商户账号能查哪些。`ttpos auth status` 同时显示两个账号的登录状态。
 
 ### 常见问题怎么问
 
@@ -125,6 +126,7 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | 查一张订单 | `ttpos order list --order-no <订单号>` |
 | 某个会员还剩多少余额 | `ttpos member list --keyword <手机号>`，再 `ttpos member get <会员 uuid>` |
 | 哪些门店快到期 | `ttpos auth login --cloud`，再 `ttpos shop expiry` |
+| 在云平台找商户、看设备限额 | `ttpos cloud shop list --keyword <名称>`，再 `ttpos cloud shop get <uuid>` |
 | 某道菜的成本 | `ttpos bom module list --keyword <菜名>` |
 
 统计默认查今天，可用 `--date yesterday|this-week|last-week|this-month|last-month`，或 `--from 2026-10-01 --to 2026-10-31`（最长 31 天）。按门店营业日计算：跨 0 点营业的门店，凌晨的单算前一天。
