@@ -17,6 +17,12 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-10
+
+### Fixed
+
+- CI 等自动化环境（设置了 `CI` 环境变量）里运行时不再上报使用统计，发版验收不会被计入使用量。
+
 ## [0.5.0] - 2026-11-10
 
 ### Added
@@ -172,7 +178,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.1
 [0.5.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.5.0
 [0.4.6]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.4.6
 [0.4.5]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.4.5
