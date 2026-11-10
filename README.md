@@ -1,17 +1,67 @@
-# ttpos
+# TTPOS CLI
 
-TTPOS 的命令行工具：在终端里查商户的订单、商品、员工、桌台、配置、支付方式等
-数据。给人用，也给 AI agent 用。
+[![npm](https://img.shields.io/npm/v/@ttpos/cli?label=npm&color=FFBE00)](https://www.npmjs.com/package/@ttpos/cli) [![release](https://img.shields.io/github/v/release/ZonEaseTech/ttpos-cli?color=FFBE00)](https://github.com/ZonEaseTech/ttpos-cli/releases)
 
-> 当前为内部预览版，面向 TTPOS 运营与支持同事。
+在终端里查询 TTPOS 门店的经营数据：今天卖了多少、某张订单怎么回事、会员还剩多少余额、哪些门店快到期。
+你可以自己输入命令查，也可以交给 Claude Code、Codex、Cursor 等 AI 助手代查。
 
-**只读**——不会改任何业务数据。本仓库只放安装脚本、agent skills 和
-[Releases](https://github.com/ZonEaseTech/ttpos-cli/releases) 里的二进制，
-不含源码。
+- **只读**：只查询，不修改任何业务数据。
+- **账号即权限**：你的 TTPOS 账号在后台能看到什么，这里就能查到什么。
+- **登录在浏览器完成**：密码只在 TTPOS 登录页输入，AI 助手接触不到。
+- **口径与后台一致**：金额字段名称和统计口径与 TTPOS 后台首页相同，按门店营业日统计。
 
-## 让 AI 帮你装（推荐）
+> 内部预览版，面向 TTPOS 运营与支持同事。支持 macOS 与 Linux，Windows 暂未提供。
 
-把下面这段话原样发给你的 AI 助手（Claude Code、Codex、Cursor 等）：
+---
+
+## 能查什么
+
+| 业务域 | 能查到的内容 | 命令 |
+| --- | --- | --- |
+| 经营 | 总销售额、实收金额、营业收入、订单数、客单价、退款与取消单；名下各门店对比；热销菜品；各支付方式收入；员工业绩与提成 | `ttpos stats` |
+| 订单 | 按日期、订单号、状态查门店订单；订单明细、付款与退款记录 | `ttpos order` |
+| 会员外送单 | 会员在线下单的外送订单：配送状态与详情 | `ttpos member-order` |
+| 会员充值 | 充值记录、充值详情、还能退多少 | `ttpos recharge` |
+| 会员 | 按手机号、会员号、昵称找会员；余额、积分、等级；消费、充值、积分流水 | `ttpos member` |
+| 商品 | 价格、上下架、分类；单位、加料、属性、规格、税类 | `ttpos product` |
+| 配方与成本 | 菜品配方、BOM 配置、套餐与订单用料、成本卡 | `ttpos bom` |
+| 门店 | 账号能访问哪些门店、默认门店与别名；哪些门店授权快到期或已过期 | `ttpos shop` |
+| 桌台 | 桌台是否开台、所在区域 | `ttpos desk` |
+| 门店配置 | 营业、收银副屏、支付开关、自助点餐机、厨显、打印联数；支付方式；打印模板 | `ttpos setting`<br>`ttpos payment-method`<br>`ttpos printer` |
+| 员工 | 员工账号、角色、每个角色的权限 | `ttpos staff` |
+
+每个命令的 `--help` 开头都列着它能回答的问题，例如 `ttpos stats --help`。
+
+### 计划支持
+
+| 业务域 | 计划内容 |
+| --- | --- |
+| 第三方外卖 | Grab、LINE MAN 等平台的外卖订单，外卖接入状态与菜单同步记录 |
+| 交班 | 交班报表 |
+| 库存 | 采购、物料、调拨、盘点 |
+| 连锁总部 | 商品上架计划、管控策略、总部下发记录 |
+| 其他 | 门店基本信息、系统通知、员工操作日志、打印自定义配置 |
+
+排期以 [Releases](https://github.com/ZonEaseTech/ttpos-cli/releases) 为准。
+
+### 不会支持
+
+| 内容 | 原因 |
+| --- | --- |
+| 下单、改价、退款、改会员余额、改门店设置等任何修改操作 | TTPOS CLI 只做查询，修改请在 TTPOS 后台或收银机上完成 |
+| 查看账号权限以外的门店或数据 | 权限以 TTPOS 账号为准 |
+| 批量导出会员的完整手机号、邮箱等联系方式 | 列表结果始终打码，防止名单外流 |
+| 查看支付渠道密钥、密码、令牌 | 这类信息始终遮蔽 |
+| 生成 Excel 或文件导出 | 需要表格时用 `--format json` 输出后自行转换 |
+| 云平台的商户开通、续费、改限额等管理操作 | 云平台账号只用于查询门店到期时间 |
+
+---
+
+## 安装与上手
+
+### 让 AI 帮你装（推荐）
+
+把下面这段话原样发给你的 AI 助手：
 
 ```text
 请帮我安装 TTPOS 命令行工具并登录：
@@ -22,186 +72,160 @@ TTPOS 的命令行工具：在终端里查商户的订单、商品、员工、�
 之后我问商户数据时，先读 ttpos-shared 技能再查。
 ```
 
-登录必须你本人在浏览器里完成，AI 不会也不应该替你输入密码。
+登录必须由你本人在浏览器里完成，AI 助手不会、也不应该替你输入密码。
 
-## 安装
+### 自己装
 
-### 方式一：npm（需 Node ≥18）
+需要 Node.js 18 或以上：
 
 ```sh
 npm install -g @ttpos/cli
-ttpos --version
 ```
 
-Linux 与 macOS（Intel / Apple 芯片）自动装对应平台包，Windows 暂未发布。
-
-### 方式二：安装脚本（无需 Node）
-
-Linux 与 macOS（Intel / Apple 芯片）：
+没有 Node.js 时用安装脚本，装到 `~/.local/bin/ttpos`，不需要 sudo，重复运行即升级：
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh
 ```
 
-装到 `~/.local/bin/ttpos`，不需要 sudo。重复运行即升级。Windows 暂未发布。
+### 三步上手
+
+```sh
+ttpos auth login         # 打开浏览器，核对码与终端一致后输入 TTPOS 账号密码
+ttpos shop use <店名>     # 设默认门店，之后的命令不用再指定门店
+ttpos stats business     # 今天的总销售额、实收金额、订单数
+```
+
+### 常见问题怎么问
+
+| 想知道 | 命令 |
+| --- | --- |
+| 今天卖了多少 | `ttpos stats business` |
+| 上个月卖了多少 | `ttpos stats business --date last-month` |
+| 名下哪家店昨天卖得最好 | `ttpos stats shops --date yesterday` |
+| 本周最畅销的菜 | `ttpos stats products --date this-week` |
+| 查一张订单 | `ttpos order list --order-no <订单号>` |
+| 某个会员还剩多少余额 | `ttpos member list --keyword <手机号>`，再 `ttpos member get <会员 uuid>` |
+| 哪些门店快到期 | `ttpos auth login --cloud`，再 `ttpos shop expiry` |
+| 某道菜的成本 | `ttpos bom module list --keyword <菜名>` |
+
+统计默认查今天，可用 `--date yesterday|this-week|last-week|this-month|last-month`，或 `--from 2026-10-01 --to 2026-10-31`（最长 31 天）。按门店营业日计算：跨 0 点营业的门店，凌晨的单算前一天。
+
+---
+
+## 给 AI 助手用
+
+安装时的 `npx skills add` 会把下面这些技能装给 AI 助手，它会按问题自动选用。技能也内置在 CLI 里，没装时可以运行 `ttpos skills read shared` 直接读。
+
+| 技能 | 用途 |
+| --- | --- |
+| `ttpos-shared` | 通用规则：登录、选门店、打码、查询上限；所有技能都先读它 |
+| `ttpos-stats` | 营业额、多店对比、热销、支付构成、提成 |
+| `ttpos-order` | 订单查询与明细 |
+| `ttpos-member-order` | 会员外送单 |
+| `ttpos-recharge` | 会员充值与可退金额 |
+| `ttpos-member` | 会员、余额积分、流水、等级 |
+| `ttpos-product` | 商品及单位、加料、属性、规格、税类 |
+| `ttpos-bom` | 配方、BOM、成本卡 |
+| `ttpos-shop` | 可访问门店、默认门店、授权到期 |
+| `ttpos-desk` | 桌台与区域 |
+| `ttpos-setting` | 门店配置 |
+| `ttpos-payment-method` | 支付方式 |
+| `ttpos-printer` | 打印模板 |
+| `ttpos-staff` | 员工、角色、权限 |
+| `ttpos-doctor` | 登录失效、连不上等问题的自查 |
+
+只装部分技能：`npx skills add ZonEaseTech/ttpos-cli -g -y --skill ttpos-stats --skill ttpos-shared`。
+升级 CLI 后运行 `npx skills update -g`，让技能跟上新版本。
+
+AI 助手调用时输出固定为 JSON，用退出码判断结果，见下方「输出格式与退出码」。
+
+---
+
+## 数据安全
+
+- 登录页只在本机 `http://127.0.0.1:<端口>` 打开。地址不是它、或页面上的核对码和终端里不一致，就不要输入密码。
+- 登录凭证只保存在本机，有效期最长 30 天。`ttpos auth logout` 立即清除。
+- 列表和搜索结果里的手机号、邮箱、证件号、银行账号、会员昵称、详细地址会打码；按 uuid 查单条时完整显示。
+- 列表里也要看完整值时加 `--reveal`：只能由人在终端运行，并输入屏幕上的确认码，AI 助手调用会被拒绝。
+- 密码、密钥、令牌类信息任何情况下都不显示。
+- 为保护线上系统，列表每页最多 100 条，订单与统计的时间范围最长 31 天。
+
+---
 
 <details>
-<summary>指定目录、指定版本、卸载、手动下载</summary>
+<summary><b>输出格式与退出码</b></summary>
 
-```sh
-# 装到别处
-curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | TTPOS_INSTALL_DIR=/usr/local/bin sh
-
-# 装指定版本
-curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | VERSION=0.3.3 sh
-
-# 卸载（保留 ~/.ttpos 下的凭证与配置）
-curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh -s -- --uninstall
-```
-
-也可以从 [Releases](https://github.com/ZonEaseTech/ttpos-cli/releases)
-下载对应平台的 `tar.gz` 自行解压。更建议用上面的脚本：它会先校验 SHA256，
-而且 macOS 从浏览器下载的可执行文件会被隔离，命令行下载不会。
-
-</details>
-
-## 上手
-
-需要一个 TTPOS 商户账号。登录在浏览器里完成，凭证只存在本机。
-
-```sh
-ttpos auth login          # 自动打开浏览器；核对码与终端一致后输入账号密码
-ttpos shop use <店名>      # 设默认商户
-ttpos order list          # 开始查
-```
-
-授权页只在本机 `http://127.0.0.1:<端口>` 提供，地址栏不是它就别输密码。
-浏览器没弹出时手动打开终端里的链接；不想自动打开加 `--no-browser`。
-查询走进程内，不用另开窗口、也不用常驻服务。卡住时跑 `ttpos doctor`。
-
-## 按业务域查
-
-| 业务域 | 能回答的问题（举例） |
-| --- | --- |
-| `ttpos stats` 经营 | 今天、本月营业额，实收、单数、客单价；各门店对比；热销菜；支付方式收入；员工提成 |
-| `ttpos order` 订单 | 某段时间的订单、按订单号查、取消单、某单明细与退款 |
-| `ttpos member-order` / `ttpos recharge` | 会员外送单；充值单与可退金额 |
-| `ttpos member` 会员 | 按手机号或会员号找会员；余额、积分、等级；消费与充值记录 |
-| `ttpos product` / `ttpos bom` 商品 | 价格、上下架、分类；配方与成本卡 |
-| `ttpos shop` 门店 | 能查哪些店；哪些店快到期（需云平台账号） |
-| `ttpos desk` / `setting` / `payment-method` / `printer` | 桌台占用、门店配置、支付方式、打印模板 |
-| `ttpos staff` 员工 | 员工、角色、权限 |
-
-每个业务域的 `--help` 开头列着它能回答的问题和对应命令，例如 `ttpos stats --help`。
-状态码都显示成文字（如"已完成""空闲"），商品显示分类名。
-`stats business` 的总销售额、实收金额、营业收入与后台首页「店内概况」同名同口径，并显示实际统计的营业日和时段；
-后台「门店汇总」报表的「总营业额」是优惠前的订单金额，口径不同。
-
-统计必须带时间范围：默认今天，可用 `--date yesterday|this-week|this-month|...` 或
-`--from/--to`（最长 31 天），按门店营业日计算。
-
-门店到期时间只有云平台能查，需要云平台账号：`ttpos auth login --cloud`（登录有效 10 小时）。
-
-## 帮助
-
-```sh
-ttpos --help                 # 全部命令（按用途分组）与快速上手
-ttpos order list --help      # 某个命令的用法、示例与注意事项
-ttpos help exit-codes        # 帮助主题：environment / exit-codes / output / reference
-```
-
-命令或参数写错时会提示最接近的写法，例如 `ttpos order lst` 会提示
-`ttpos order list`。按 Tab 补全：`ttpos completion zsh`（或 bash / fish）。
-
-能查哪些商户取决于登录
-账号绑定了哪些商户。
-
-为保护生产系统，列表单页最多 100 条，订单类查询的时间范围最长 31 天。
-
-## 已知副作用
-
-CLI 只发查询请求，但 TTPOS 服务端在"进入某个商户"这一步会记录两件事：
-
-- 该账号"上次进入的门店"会更新为最近查询的商户（移动管理端下次默认打开它）；
-- 商户的设备列表里会出现一条名为 `ttpos-cli` 的管理端设备记录（不占设备名额）。
-
-同一账号对同一商户每小时最多触发一次。
-
-## 输出
-
-终端里默认表格，管道或 agent 调用时默认 JSON。任何命令都可以加
-`--format json`。
+在终端里默认输出表格，被脚本或 AI 助手调用时默认输出 JSON。任何命令都可以加 `--format json`。
 
 | 退出码 | 含义 |
 | --- | --- |
 | 0 | 成功 |
 | 1 | 业务错误或网络失败 |
-| 2 | 用法错误（缺参数、取值非法、未知 flag） |
-| 3 | 未登录 |
+| 2 | 用法错误（缺参数、取值非法、未知参数） |
+| 3 | 未登录或登录已失效 |
 
-非交互环境下，错误一律是 JSON 信封：
+出错时输出：
 
 ```json
 {"ok":false,"error":{"code":"...","message":"...","hint":"..."}}
 ```
 
-## 敏感信息
+更多说明：`ttpos help output`、`ttpos help exit-codes`。
 
-输出默认做了脱敏，方便直接交给 agent：
+</details>
 
-- 密码、私钥、token 类字段始终显示为 `"***"`。
-- 列表和搜索结果里，手机号、邮箱、证件号、银行账号、会员昵称、详细地址打码（如
-  `******5678`、`a***@example.com`），防止批量拉取名单。
-- 按 uuid 查单条（如 `member get`、`staff get`、`order get`）时完整显示联系方式。
-- 列表里也要看完整值时加全局 `--reveal`：只能由人在终端运行，并输入屏幕上显示的确认码；agent 调用会被拒绝。
-- 字符串中的终端控制字符会被去掉。
+<details>
+<summary><b>CLI 装在远程机器上，怎么登录</b></summary>
 
-## Agent skills
-
-skills 已编进二进制，与当前版本一致：
+CLI 在远程机器（如 Coder、SSH 登录的服务器）、浏览器在自己电脑上时，固定登录页端口，再转发到本地：
 
 ```sh
-ttpos skills list
-ttpos skills read order
+ttpos auth login --port 7080                 # 在远程机器上运行
+ssh -L 7080:127.0.0.1:7080 <主机>             # 在自己电脑上运行（Coder 用 coder port-forward <工作区> --tcp 7080）
 ```
 
-CLI 和 skills 一起装给 agent 用（推荐全局安装，任何目录都生效；需要 Node）：
+然后在自己电脑的浏览器打开终端里打印的 `http://127.0.0.1:7080/authorize?...`。
+
+只把端口转发到你自己的机器，不要运行别人发来的转发命令，也不要打开别人发来的登录链接。
+
+</details>
+
+<details>
+<summary><b>使用后在后台留下的痕迹</b></summary>
+
+CLI 只查询，但进入某个门店查询时，TTPOS 会记录两件事：
+
+- 账号「上次进入的门店」会更新为最近查询的门店，移动管理端下次默认打开它；
+- 门店的设备列表里会出现一条名为 `ttpos-cli` 的管理端设备，不占设备名额。
+
+同一账号对同一门店，每小时最多记录一次。
+
+</details>
+
+<details>
+<summary><b>升级、指定版本与卸载</b></summary>
 
 ```sh
-npm install -g @ttpos/cli && npx skills add ZonEaseTech/ttpos-cli -g -y
+npm install -g @ttpos/cli@latest                  # npm 安装的升级
+curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh                          # 脚本安装的升级
+curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | VERSION=0.4.3 sh            # 装指定版本
+curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | TTPOS_INSTALL_DIR=/usr/local/bin sh   # 装到别的目录
+curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.sh | sh -s -- --uninstall        # 卸载（保留 ~/.ttpos 下的登录与配置）
 ```
 
-agent 代办登录时，把 `ttpos auth login` 放到后台运行，把它打印的链接和核对码转给人，等它退出。
+也可以从 [Releases](https://github.com/ZonEaseTech/ttpos-cli/releases) 下载对应平台的压缩包。建议用安装脚本：它会校验文件完整性，并避开 macOS 对浏览器下载文件的隔离。
 
-去掉 `-g` 只装到当前项目。升级 CLI 后运行 `npx skills update -g`，让 skills 跟上。没有 Node
-时让 agent 直接读内置说明：先 `ttpos skills read shared`，再读对应业务的 skill。
+</details>
 
-每个命令域一份 skill，写了参数陷阱和已知局限。`--shop` 的解析规则只写在
-[`ttpos-shared`](skills/ttpos-shared/SKILL.md) 里，和其他 skill 一起装。
+<details>
+<summary><b>遇到问题</b></summary>
 
-也可以只装需要的：
+先运行 `ttpos doctor`，它会检查登录、会话和默认门店，并给出处理建议。
+命令写错时会提示最接近的写法；按 Tab 补全可运行 `ttpos completion zsh`（或 bash、fish）开启。
 
-```sh
-npx skills add ZonEaseTech/ttpos-cli -g -y --skill ttpos-order --skill ttpos-shared
-```
-
-## 远端授权
-
-CLI 在远端机器（Coder、SSH 登录的服务器），浏览器在本地时：固定授权页端口，
-再转发到本地。
-
-```sh
-ttpos auth login --port 7080                 # 远端
-coder port-forward <workspace> --tcp 7080    # 本地，二选一
-ssh -L 7080:127.0.0.1:7080 <host>            # 本地，二选一
-```
-
-然后在本地浏览器打开终端打印的 `http://127.0.0.1:7080/authorize?...`。
-授权页只监听回环地址，不提供公网访问方式。
-
-**防钓鱼：**端口只转发到你自己的机器，不要运行别人发来的转发命令，也不要打开别人发来的授权链接。
-页面上的核对码必须和你自己终端里打印的一致，不一致就立刻关闭。
+</details>
 
 ## 反馈
 
-问题请开 [Issue](https://github.com/ZonEaseTech/ttpos-cli/issues)。
+问题与建议请提 [Issue](https://github.com/ZonEaseTech/ttpos-cli/issues)。
