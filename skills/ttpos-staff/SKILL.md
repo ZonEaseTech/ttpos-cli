@@ -1,6 +1,6 @@
 ---
 name: ttpos-staff
-description: Looks up TTPOS staff accounts, roles and the permission tree through the ttpos CLI, with contact details masked in lists and shown in full for a single staff member. Use when asked 有哪些员工, 谁是超管, 员工详情, 员工联系方式, 员工手机号, 有哪些角色, 这个角色有哪些权限, 权限树. Not for orders, products, desks or member data.
+description: Looks up TTPOS staff accounts, roles and the permission tree through the ttpos CLI, with contact details masked in lists and shown in full for a single staff member. Also reads the staff operation log of changes made in the back office. Use when asked 有哪些员工, 谁是超管, 员工详情, 员工联系方式, 员工手机号, 有哪些角色, 这个角色有哪些权限, 权限树, 谁改了价格, 谁改的, 操作日志, 操作记录. Not for orders, products, desks or member data.
 metadata:
   requires:
     bins: ["ttpos"]
@@ -17,6 +17,12 @@ metadata:
 | 有哪些员工、什么角色 | `ttpos staff list` |
 | 某个员工的完整联系方式 | `ttpos staff get <uuid>` |
 | 某个角色有哪些权限 | `ttpos staff role get <uuid>` |
+| 谁在什么时候改了什么（改价、上下架、改设置等） | `ttpos staff log --from 2026-11-01 --to 2026-11-07` |
+| 某个员工做过哪些修改 | `ttpos staff log --staff <姓名>` |
+
+## 操作日志
+
+`staff log` 只记录后台里的修改操作，不记录查询；最新的在前。`--title` 按操作名筛（例如「改价」），`--target` 按操作对象筛（例如商品名），`--result 0` 只看失败的。时间范围最长 31 天，按门店时区。
 
 ## 联系方式
 

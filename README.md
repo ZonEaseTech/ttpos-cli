@@ -21,6 +21,7 @@
 | **经⁠营** | `ttpos stats`<br>总销售额、实收金额、营业收入、订单数、客单价、退款与取消单；名下各门店对比；热销菜品；各支付方式收入；员工业绩与提成 |
 | **订⁠单** | `ttpos order`<br>按日期、订单号、状态查门店订单；订单明细、付款与退款记录 |
 | **外⁠送⁠订⁠单** | `ttpos member-order`<br>会员在线下单的外送订单：配送状态与详情 |
+| **外⁠卖** | `ttpos takeout`<br>Grab、LINE MAN 的外卖订单（已结束和进行中）、订单详情；平台是否开启和绑定、菜单最近一次推送 |
 | **会⁠员⁠充⁠值** | `ttpos recharge`<br>充值记录、充值详情、还能退多少 |
 | **会⁠员** | `ttpos member`<br>按手机号、会员号、昵称找会员；余额、积分、等级；消费、充值、积分流水 |
 | **商⁠品** | `ttpos product`<br>价格、上下架、分类；单位、加料、属性、规格、税类 |
@@ -28,7 +29,7 @@
 | **门⁠店** | `ttpos shop`<br>账号能访问哪些门店、默认门店与别名；哪些门店授权快到期或已过期 |
 | **桌⁠台** | `ttpos desk`<br>桌台是否开台、所在区域 |
 | **门⁠店⁠配⁠置** | `ttpos setting` `ttpos payment-method` `ttpos printer`<br>营业、收银副屏、支付开关、自助点餐机、厨显、打印联数；支付方式；打印模板 |
-| **员⁠工** | `ttpos staff`<br>员工账号、角色、每个角色的权限 |
+| **员⁠工** | `ttpos staff`<br>员工账号、角色、每个角色的权限；操作日志（谁在什么时候改了什么） |
 
 每个命令的 `--help` 开头都列着它能回答的问题，例如 `ttpos stats --help`。
 
@@ -36,11 +37,11 @@
 
 | 业务域 | 计划内容 |
 | --- | --- |
-| 第三方外卖 | Grab、LINE MAN 等平台的外卖订单，外卖接入状态与菜单同步记录 |
+| 外卖 | 外卖菜单、促销活动、营业时间 |
 | 交班 | 交班报表 |
 | 库存 | 采购、物料、调拨、盘点 |
 | 连锁总部 | 商品上架计划、管控策略、总部下发记录 |
-| 其他 | 门店基本信息、系统通知、员工操作日志、打印自定义配置 |
+| 其他 | 门店基本信息、系统通知、打印自定义配置 |
 
 排期以 [Releases](https://github.com/ZonEaseTech/ttpos-cli/releases) 为准。
 
@@ -104,6 +105,8 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | 上个月卖了多少 | `ttpos stats business --date last-month` |
 | 名下哪家店昨天卖得最好 | `ttpos stats shops --date yesterday` |
 | 本周最畅销的菜 | `ttpos stats products --date this-week` |
+| 今天 Grab 取消了哪些单 | `ttpos takeout orders --platform grab --status 60` |
+| 谁改了价格 | `ttpos staff log --title 改价` |
 | 查一张订单 | `ttpos order list --order-no <订单号>` |
 | 某个会员还剩多少余额 | `ttpos member list --keyword <手机号>`，再 `ttpos member get <会员 uuid>` |
 | 哪些门店快到期 | `ttpos auth login --cloud`，再 `ttpos shop expiry` |
@@ -123,6 +126,7 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | `ttpos-stats` | 营业额、多店对比、热销、支付构成、提成 |
 | `ttpos-order` | 订单查询与明细 |
 | `ttpos-member-order` | 会员外送单 |
+| `ttpos-takeout` | Grab、LINE MAN 外卖订单与平台状态 |
 | `ttpos-recharge` | 会员充值与可退金额 |
 | `ttpos-member` | 会员、余额积分、流水、等级 |
 | `ttpos-product` | 商品及单位、加料、属性、规格、税类 |
@@ -132,7 +136,7 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | `ttpos-setting` | 门店配置 |
 | `ttpos-payment-method` | 支付方式 |
 | `ttpos-printer` | 打印模板 |
-| `ttpos-staff` | 员工、角色、权限 |
+| `ttpos-staff` | 员工、角色、权限、操作日志 |
 | `ttpos-doctor` | 登录失效、连不上等问题的自查 |
 
 只装部分技能：`npx skills add ZonEaseTech/ttpos-cli -g -y --skill ttpos-stats --skill ttpos-shared`。
@@ -150,6 +154,7 @@ AI 助手调用时输出固定为 JSON，用退出码判断结果，见下方「
 - 列表里也要看完整值时加 `--reveal`：只能由人在终端运行，并输入屏幕上的确认码，AI 助手调用会被拒绝。
 - 密码、密钥、令牌类信息任何情况下都不显示。
 - 为保护线上系统，列表每页最多 100 条，订单与统计的时间范围最长 31 天。
+- 使用统计：每条命令结束后，会匿名上报命令名、版本、是否成功、用时，以及是人在终端还是 AI 在调用，用于决定先改进什么。不上报参数、门店、金额、账号；首次在终端运行时会提示一次。关闭：设置环境变量 `TTPOS_NO_TELEMETRY=1`。
 
 ---
 
@@ -228,4 +233,10 @@ curl -fsSL https://raw.githubusercontent.com/ZonEaseTech/ttpos-cli/main/install.
 
 ## 反馈
 
-问题与建议请提 [Issue](https://github.com/ZonEaseTech/ttpos-cli/issues)。
+想要的功能还没有，或有改进建议，直接在终端里发给维护者：
+
+```sh
+ttpos feedback "希望能查交班报表"
+```
+
+AI 助手遇到做不到的事，会先问你要不要反馈，你同意后它才会发送。也可以提 [Issue](https://github.com/ZonEaseTech/ttpos-cli/issues)。
