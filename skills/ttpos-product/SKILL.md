@@ -1,6 +1,6 @@
 ---
 name: ttpos-product
-description: Looks up TTPOS products and categories through the ttpos CLI, plus units, sauces (加料), attribute groups, flavors (规格), single-spec products and tax classes. Use when asked 有哪些商品, 这个分类下有多少商品, 商品详情, 商品分类树, 商品单位, 加料, 属性分组, 规格, 税类, 税率. Not for recipes and cost cards (ttpos-bom), orders, desks or staff.
+description: Looks up TTPOS products and categories through the ttpos CLI, plus units, sauces (加料), attribute groups, flavors (规格), single-spec products and tax classes. Use when asked 有哪些商品, 这个分类下有多少商品, 商品详情, 商品分类树, 商品单位, 加料, 属性分组, 规格, 税类, 税率. Also changes prices and on/off-shelf status in bulk through a preview-confirm-undo flow, and audits a menu for wrong prices and dishes without a kitchen printer. Use when asked 批量改价, 涨价, 降价, 上架, 下架, 菜单检查, 没配打印. Not for recipes and cost cards (ttpos-bom), orders, desks or staff.
 metadata:
   requires:
     bins: ["ttpos"]
@@ -21,6 +21,26 @@ metadata:
 | 谁改过时段菜单 | `ttpos product period-log` |
 | 有哪些分批上菜类型 | `ttpos product batch-tags` |
 | 商品的规格、加料、税类 | `ttpos product get <uuid>` |
+| 菜单有没有配错：价格离谱、上架了没配厨房打印 | `ttpos product audit` |
+
+## 改菜单（改价、上下架）
+
+客户要求改价或上下架时按这四步做，不要跳步：
+
+1. **生成改动单（不会修改）**：
+   - 改价：`ttpos product change price` 加选择条件和一种改法（`--set 59`、`--add 5`、`--percent 10`，可加 `--round-to 1` 取整）。
+   - 上下架：`ttpos product change status --on` 或 `--off` 加选择条件。
+   - 选择条件：`--uuid <a>,<b>`、`--category <分类名或 uuid>`、`--keyword <名称里的词>`、`--all`。一张改动单最多 50 个商品，超过就按分类分几次。
+2. **把预览给用户核对**：逐项列出「现在 → 改成」，`warnings` 里的每条提醒都要原样告诉用户（例如前后相差 10 倍、和同分类价格差太多、一次下架很多）。有提醒时先问清楚再继续。
+3. **执行**：
+   - 上下架：把预览发给用户，等用户回复同意后，再运行 `ttpos change apply <编号> --yes`。生成和执行不要放在同一轮里做。唯一的例外：用户点名了一个具体商品、预览里只有这一项且没有提醒，可以直接执行。
+   - 改价：你不能执行。请用户自己在终端运行 `ttpos change apply <编号>` 并输入确认码（Claude Code 里是 `! ttpos change apply <编号>`）。返回 `REVEAL_REQUIRES_TERMINAL` 就是这个原因，不要重试，也不要想办法绕过。
+4. **核对并告知怎么撤回**：执行后看每项的 `result`，再告诉用户「要改回去运行 `ttpos change undo <编号>`」。
+
+- 执行时提示「现在的值和改动单不一致」，说明有人在这之后改过，重新生成改动单。
+- 总部管控的商品门店不能改，会被跳过并写在 `warnings` 里。
+- 新增菜之后运行一次 `ttpos product audit`，把「没配打印」的菜告诉用户：这些菜下单后厨房不出单。目前打印档口要在后台的「商品打印」里分配，CLI 还不能改。
+- `ttpos change list` 是本机的操作记录：谁、什么时候、替哪家店改了什么。
 
 ## 命令
 

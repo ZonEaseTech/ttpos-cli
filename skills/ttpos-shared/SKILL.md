@@ -8,7 +8,7 @@ metadata:
 
 # ttpos-shared
 
-所有 ttpos skill 的底座，先读这份。`ttpos` 是 TTPOS 餐饮 POS 的只读查询 CLI，不改业务数据。内置说明与当前版本一致：`ttpos skills list`、`ttpos skills read <名>`。
+所有 ttpos skill 的底座，先读这份。`ttpos` 是 TTPOS 餐饮 POS 的查询 CLI。能修改的只有商品价格和上下架，流程见 `ttpos-product` 的「改菜单」，其余命令都只读。内置说明与当前版本一致：`ttpos skills list`、`ttpos skills read <名>`。
 
 ## 按业务域找 skill
 
@@ -21,7 +21,7 @@ metadata:
 | 会员充值单、可退金额 | `ttpos-recharge` |
 | 会员余额、积分、等级、消费记录、会员卡、充值和消费排行 | `ttpos-member` |
 | 营销活动、优惠券、满减 | `ttpos-marketing` |
-| 商品、分类、价格 | `ttpos-product` |
+| 商品、分类、价格；批量改价、上下架；菜单检查 | `ttpos-product` |
 | 配方、成本卡 | `ttpos-bom` |
 | 能查哪些店、门店到期、门店基本信息、叫号屏设备、在云平台搜商户（状态、时区、设备限额） | `ttpos-shop` |
 | 系统通知、待审批提醒 | `ttpos-notice` |

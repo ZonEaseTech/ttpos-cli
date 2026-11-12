@@ -17,6 +17,18 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-12
+
+### Added
+
+- `ttpos product change price`、`ttpos product change status`：批量改价、上下架。先生成改动单预览，列出每个商品「现在 → 改成」和可能输错的提醒（前后相差 3 倍以上、和同分类常见价格差 5 倍以上、一次下架 10 个以上）。可按商品、分类、名称关键词或整店选择，一张改动单最多 50 个商品。
+- `ttpos change apply`、`ttpos change undo`、`ttpos change list`、`ttpos change show`：执行、撤回、查看改动单。执行前重新核对现值，有人改过就中止。上下架加 `--yes` 执行；改价必须由人在终端输入确认码，AI 不能代为确认。改动单存在本机，同时是操作记录。
+- `ttpos product audit`：菜单检查（只读），列出上架中价格为 0、价格和同分类差 5 倍以上、没有分配打印档口的商品。
+
+### Changed
+
+- ttpos 不再是纯只读：可以修改商品价格和上下架，其余命令仍然只读。修改前会核对账号是否有后台的「商品编辑」权限。
+
 ## [0.13.1] - 2026-11-12
 
 ### Security
@@ -272,7 +284,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.14.0
 [0.13.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.13.1
 [0.13.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.13.0
 [0.12.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.12.0
