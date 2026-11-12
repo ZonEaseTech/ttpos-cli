@@ -17,6 +17,12 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-12
+
+### Added
+
+- 更新提醒：每 24 小时检查一次有没有新版本。落后时，终端里显示一行提示；AI 助手调用时，输出里带 `update` 字段（当前版本、最新版本、更新命令），内置技能会让 AI 先更新 CLI 和技能再继续。CI 环境不检查；设置 `NO_UPDATE_NOTIFIER=1` 或 `TTPOS_NO_UPDATE_CHECK=1` 关闭。
+
 ## [0.14.0] - 2026-11-12
 
 ### Added
@@ -284,7 +290,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.15.0
 [0.14.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.14.0
 [0.13.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.13.1
 [0.13.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.13.0

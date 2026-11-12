@@ -161,7 +161,7 @@ ttpos stats business     # 今天的总销售额、实收金额、订单数
 | `ttpos-doctor` | 登录失效、连不上等问题的自查 |
 
 只装部分技能：`npx skills add ZonEaseTech/ttpos-cli -g -y --skill ttpos-stats --skill ttpos-shared`。
-升级 CLI 后运行 `npx skills update -g`，让技能跟上新版本。
+有新版本时 CLI 会提示：终端里显示一行，AI 助手会在输出里看到并自动更新 CLI 和技能。手动更新：`npm install -g @ttpos/cli@latest && npx skills add ZonEaseTech/ttpos-cli -g -y`。不想被提示就设置 `NO_UPDATE_NOTIFIER=1`。
 
 AI 助手调用时输出固定为 JSON，用退出码判断结果，见下方「输出格式与退出码」。
 
