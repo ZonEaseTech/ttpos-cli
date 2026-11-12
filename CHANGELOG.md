@@ -17,6 +17,16 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-12
+
+### Added
+
+- `ttpos product change printer`：把选中的商品分配到指定的打印档口，同样走改动单：预览、`ttpos change apply <编号> --yes` 执行、可撤回。保存后逐个核对商品的其他字段没有变化。套餐和带加料的商品暂不支持，会在预览里说明。
+
+### Changed
+
+- `ttpos product audit` 的说明里列出门店的打印档口名称，并提示没配打印的菜怎么配上。
+
 ## [0.15.0] - 2026-11-12
 
 ### Added
@@ -290,7 +300,8 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 - 浏览器登录（核对码确认），`doctor` 环境自查，安装脚本，以及 macOS 和 Linux 四个平台的程序。
 - 用法错误统一返回退出码 2 和 JSON 格式的错误信息。
 
-[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/ZonEaseTech/ttpos-cli/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.16.0
 [0.15.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.15.0
 [0.14.0]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.14.0
 [0.13.1]: https://github.com/ZonEaseTech/ttpos-cli/releases/tag/v0.13.1
