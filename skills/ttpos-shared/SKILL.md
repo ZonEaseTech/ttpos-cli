@@ -15,7 +15,7 @@ metadata:
 | 想知道 | 读哪个 skill |
 |---|---|
 | 营业额、各店对比、热销、支付构成、提成 | `ttpos-stats` |
-| 订单、取消单、某单详情 | `ttpos-order` |
+| 订单、取消单、某单详情；把订单导出成表格（每家门店一个文件） | `ttpos-order` |
 | 会员外送单 | `ttpos-member-order` |
 | Grab、LINE MAN 外卖订单、外卖平台接入状态 | `ttpos-takeout` |
 | 会员充值单、可退金额 | `ttpos-recharge` |
