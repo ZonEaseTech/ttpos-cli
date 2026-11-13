@@ -1,6 +1,6 @@
 ---
 name: ttpos-order
-description: Looks up TTPOS sales orders through the ttpos CLI, listing them by date range, status or 18-digit order number fetching one order's detail by 16-digit sale_bill_uuid, and exporting a period's orders to Excel files, one file per store, for one store or every store the account can access. Use when asked 导出订单, 导订单明细, 每家门店的订单表, 把上个月的订单导出来, 查订单, 最近的订单, 某天的订单, 这笔订单的详情, 按订单号查, or given an order number or sale_bill_uuid. Not for member orders (ttpos-member-order) or recharge orders (ttpos-recharge).
+description: Looks up TTPOS sales orders through the ttpos CLI, listing them by date range, status or 18-digit order number fetching one order's detail by 16-digit sale_bill_uuid, and exporting a period's dine-in orders to Excel files (one file per store plus a summary sheet, zipped) for one store or every store the account can access, as a background job polled by re-running the same command. Use when asked 导出订单, 导订单明细, 每家门店的订单表, 把上个月的订单导出来, 查订单, 最近的订单, 某天的订单, 这笔订单的详情, 按订单号查, or given an order number or sale_bill_uuid. Not for member orders (ttpos-member-order) or recharge orders (ttpos-recharge).
 metadata:
   requires:
     bins: ["ttpos"]
@@ -57,24 +57,43 @@ ttpos order list --status 2                           # 0 待付款、1 已完�
 
 ## 导出订单：`ttpos order export`
 
-用户说「导出某某商户某个月的订单」时用。只需要弄清两件事：哪个商户、哪段时间。其余不用问用户。
+用户说「把某某客户某个月的订单导出来」「某某的几十家店 10 月的数据我都要」时用。只需要弄清两件事：哪个客户、哪段时间。其余不用问用户。
 
 ```bash
-ttpos order export --all --month 2026-10                  # 当前账号能访问的全部门店，一家一个文件
+ttpos order export --all --month 2026-10                  # 当前账号能访问的全部门店
 ttpos order export --shop <商户> --month 2026-10           # 只导一家
-ttpos order export --all --from 2026-10-01 --to 2026-10-15 --out ./订单
+ttpos order export --all --from 2026-10-01 --to 2026-10-15
 ```
 
-怎么做：
+导出在后台进行，这条命令最多等 1 分钟就返回进度。**同一条命令反复运行就是查进度，不会重复导出**，所以整个过程就是「运行 → 看 `data.state` → 没完就再运行」。
 
-1. **认时间。**「上个月」「10 月」换成 `--month YYYY-MM`；给了起止日期用 `--from/--to`。一次最多 31 天，跨月的要求按月分几次跑。用户没说时间就问一句，不要猜。
-2. **认商户。** 连锁客户用总部账号登录，`--all` 就是它名下的全部门店（先 `ttpos shop list` 看一眼有几家、是不是用户说的那个客户）。只要其中几家，就对每家各跑一次 `--shop`。当前登录的不是这个客户的账号，让用户先 `ttpos auth login` 换成客户的账号。
-3. **直接跑，不用预览。** 导出只读数据，不改任何东西。门店多、订单多时要几分钟，等它跑完。
-4. **报告结果。** 读输出的 `data.dir`（文件所在目录）和 `data.list`（每家店的 `status`、`orders`、`order_amount`、`payment_amount`、`file`），告诉用户：文件在哪、导了几家、共多少单，哪几家是 0 单，哪几家失败。
-5. **有失败（exit 1）就原样再跑一次同一条命令。** 已导出的文件会跳过，只补失败的门店。要重新导出已有的文件加 `--force`。
+### 步骤
 
-表格内容：每张订单一行，列为订单ID、订单类型、商品信息、订单号、状态、支付时间（门店当地时间）、订单金额、优惠折扣、实付金额、退款金额、支付方式。包含待付款和已取消的订单，用「状态」列区分。文件名是 `门店编码_订单明细_门店uuid_起_止.xlsx`。表里不含会员手机号等联系方式。
+1. **认时间。**「上个月」「10 月」换成 `--month YYYY-MM`；给了起止日期用 `--from/--to`。一次最多 31 天，跨月的要求按月分几次。用户没说时间就问一句，不要猜。
+2. **认客户。** 运行 `ttpos shop list`，看当前账号下有几家店、是不是用户说的那个客户。连锁客户要用客户的总部账号登录，`--all` 才是它名下的全部门店。不是这个客户的账号，或者门店数和用户说的差很多，先告诉用户，让他 `ttpos auth login` 换成客户的账号，不要导错客户。只要其中几家时，对每家各用一次 `--shop`（一次只能跑一个导出，等上一个完成）。
+3. **运行导出命令**，不需要预览，它只读数据。
+4. **看 `data.state`：**
 
-内容默认中文；客户要英文或泰文加 `--lang en` / `--lang th`。不要自己打开表格改数字或重算合计；用户要别的列或别的格式，如实说现在只有这一种，并用 `ttpos feedback` 记下来。
+   | state | 意思 | 你要做的 |
+   |---|---|---|
+   | `running` | 还在导，`data.finished`/`data.total` 是进度 | 告诉用户进度，然后**原样再运行同一条命令**。重复到不是 `running` 为止。不要加 `--force`，不要换目录，不要同时开第二个导出 |
+   | `done` | 全部导完 | 进入第 5 步 |
+   | `failed`（exit 1） | 有门店没导出来 | 原样再运行一次，只会补导失败的门店。连续两次还是失败：运行 `ttpos auth status`，登录失效就让用户重新登录；登录正常就把失败的门店和 `error` 原样告诉用户，不要一直重试 |
+
+5. **交付。** 告诉用户：
+   - 压缩包的位置（`data.zip`），里面是每家门店一个表格，加一张 `汇总.xlsx`；
+   - 一共几家店、多少张账单、订单金额和实付金额合计（`data.total`、`data.orders`、`data.order_amount`、`data.payment_amount`）；
+   - 哪几家是 0 单（`data.list[]` 里 `orders` 为 0 的），请用户确认这些店当月是否确实没营业；
+   - 这份导出只含用餐订单（桌台、点餐），不含外送、第三方外卖和充值。
+
+### 要知道的事
+
+- 几十家店要几分钟到十几分钟，中间多次看到 `running` 是正常的。命令被中断、电脑断网、会话结束都不要紧，再运行同一条命令会接着导。
+- 表格和商户后台「用餐订单 › 导出」的列一样：订单ID、订单类型、商品信息、桌号/序号、订单号、状态、支付时间、订单金额、服务费、优惠折扣、会员折扣、实付金额、退款金额、会员、支付方式、用餐方式、收银员。包含待付款和已取消的订单，用「状态」列区分。后台一次最多导 1000 条，这里没有这个限制。
+- 「会员」一列的姓名和手机号是打码的。客户需要完整的会员信息，请用户到商户后台查看。
+- 文件名是 `门店编码_订单明细_门店uuid_起_止.xlsx`。内容默认中文，客户要英文或泰文加 `--lang en` / `--lang th`（表头仍是中文）。
+- 同一台电脑同一时间只能跑一个导出，这是为了不给后台造成压力。提示「已经有一个导出在进行」时等它完成。
+- 已经导出过的不会重导。数据有变化、需要重新导出时才加 `--force`。
+- 不要自己打开表格改数字、重算合计或合并文件。用户要别的列或别的格式，如实说现在只有这一种，并用 `ttpos feedback` 记下来。
 
 退出码见 `ttpos help exit-codes`。
