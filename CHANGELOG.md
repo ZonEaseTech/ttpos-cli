@@ -17,6 +17,17 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-13
+
+### Fixed
+
+- 用连锁总部账号 `ttpos order export --all` 时，账号进不去的下级门店不再被当成故障：以前连续 3 家进不去就整体停止并冷却 10 分钟，结果一家也导不出来。现在能导的照常导完，进不去的门店单独列出（`status` 为 `no_access`，`data.state` 为 `partial`），压缩包和汇总表照常生成，汇总表里标「未导出」和原因。
+- 用 `--shop` 查一家账号进不去的门店时，错误从笼统的 `UPSTREAM_ERROR` 改为 `SHOP_NOT_IN_SCOPE`，并说明原因和办法（账号在该门店没有员工身份，换账号或请客户把账号加到门店）。
+
+### Changed
+
+- `ttpos order export` 的输出新增 `data.no_access`（进不去的门店数）和状态 `partial`。
+
 ## [0.19.0] - 2026-11-13
 
 ### Added

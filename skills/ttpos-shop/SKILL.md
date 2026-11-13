@@ -17,7 +17,7 @@ metadata:
 
 | 问题 | 命令 |
 |---|---|
-| 我能查哪些门店 | `ttpos shop list` |
+| 我能查哪些门店 | `ttpos shop list`（连锁总部账号会列出全部下级门店，但只有账号在该门店里有员工身份才能用 `--shop` 查它；进不去时报 `SHOP_NOT_IN_SCOPE` 并说明原因，如实告诉用户换账号，不要重试） |
 | 之后都查这家店 | `ttpos shop use <标识>` |
 | 哪些门店 30 天内到期或已过期 | `ttpos shop expiry` |
 | 60 天内到期的 | `ttpos shop expiry --within 60` |
