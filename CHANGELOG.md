@@ -17,6 +17,12 @@ TTPOS CLI（`@ttpos/cli`）每个版本的变更都记在这里，最新的在�
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-11-17
+
+### Changed
+
+- TTPOS 后台没有在时限内响应时，错误里的 `hint` 会写明「后台临时繁忙，与登录和参数无关，等 1–2 分钟原样重试」。以前只有一句 `context deadline exceeded`，AI 助手容易去重新登录或改参数。`ttpos-shared` 技能同步加了这条。
+
 ## [0.23.0] - 2026-11-16
 
 ### Added
