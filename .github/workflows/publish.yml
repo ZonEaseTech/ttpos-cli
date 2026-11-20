@@ -5,7 +5,7 @@ name: Publish
 #
 # npm 上绑定了「本仓库 + publish.yml + npm-publish environment」，改名要同步改 npm。
 # 安全边界：
-# - 只接受发版 App 触发，交接包按 sha256 校验，内容必须和私有仓的编译结果一致；
+# - 只接受发版 App 或维护者触发，交接包按 sha256 校验，内容必须和私有仓（或组织构建工厂）的编译结果一致；
 # - 发布逻辑全部写在本文件里。App 没有 workflows 权限，改不了它；job 不 checkout，
 #   仓库里的其他文件影响不到发布。
 # 正本在私有仓 ttpos-cli/public/.github/，main 受规则保护，改动走 PR。
@@ -32,7 +32,9 @@ defaults:
 
 jobs:
   publish:
-    if: github.ref == 'refs/heads/main' && github.actor == 'ttpos-cli-release[bot]'
+    # 发版 App（私仓 Actions 正常时）或维护者（私仓 Actions 停用时，用 scripts/release-from-factory.sh 发布构建工厂的成品）。
+    # 维护者本来就能改本仓库的工作流，放行它不扩大权限。
+    if: github.ref == 'refs/heads/main' && contains(fromJSON('["ttpos-cli-release[bot]", "BenDaye"]'), github.actor)
     environment: npm-publish
     runs-on: ubuntu-24.04
     timeout-minutes: 60
